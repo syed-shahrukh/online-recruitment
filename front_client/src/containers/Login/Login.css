@@ -1,0 +1,73 @@
+img {
+  width:30px;
+  height: 30px;
+}
+.wrap{
+  background-color: #F3F3F4;
+  overflow: hidden;
+  height: 100%;
+}
+.dialogue-title{
+  border-bottom: 2px solid black;
+}
+.logo img{
+  float: right;
+  margin-top: 20px;
+}
+.buttons{
+ margin-left: 10px;
+ display: block;
+ width: 98%;
+
+}
+.login-window{
+  display: block;
+  border: 2px solid black;
+    float: left;
+    text-align: left;
+    margin-left: 20%;
+    margin-top: 10%;  
+    padding-bottom: 1%;
+   width: 50%;
+    background-color: white;
+}
+.login-form{
+  padding-top: 30px;
+  padding-bottom: 10px;
+}
+.line-drawer{
+
+    display: block;
+    position: fixed;
+    top:20%;
+    left: 50%;
+    height: 500px;
+    border-right: 2px solid black;
+    /* width: 0%; */
+    
+}
+.signup-window{
+  
+  text-align: left;
+  float: right;
+  margin-right: 20%;
+  margin-top: 10%;
+  padding-bottom: 1%;
+  border: 2px solid black;
+  padding-bottom: 1%;
+    width: 50%; 
+    background-color: white;
+}
+.empty-parent-login{
+  width: 50%;
+
+
+  align-content: center;
+  float:left;
+}
+.empty-parent-signup{
+   width: 50%;  
+
+  align-content: center;
+  float:right;
+}

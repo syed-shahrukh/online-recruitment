@@ -1,0 +1,67 @@
+/* The side navigation menu */
+.sidenav {
+    
+    z-index: 1; /* Stay on top */
+    float:left;
+    height: -webkit-stretch;
+    width:13%;
+    background-color: white; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    text-align: left; /* Place content 60px from the top */
+    
+}
+
+/* The navigation menu links */
+.sidenav a {
+    padding: 8px 8px 8px 12px;
+    border-bottom: 2px solid #c3c3c3;
+    text-decoration: none;
+    font-size: 14px;
+    color: black;
+    display: block;
+    transition: all .25s ease-in;
+    background-image: linear-gradient(to left,
+                                      transparent,
+                                      transparent 50%,
+                                      #f4c12b 50%,
+                                      #f4c12b);
+                                      background-position: 100% 0;
+                                      background-size: 200% 100%;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+    cursor: pointer;
+    color: white;
+    background-color: #f4c12b;
+    background-position: 0 0;
+                    color:#333;
+}
+.currentlyactive {
+    color: black;
+    background-color: #f4c12b;
+    background-image: linear-gradient(to left,
+                                      transparent,
+                                      transparent 50%,
+                                      #f4c12b 50%,
+                                      #f4c12b);
+                                      background-position: 100% 0;
+                                      background-size: 200% 100%;
+    
+}
+
+/* Position and style the close button (top right corner) */
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+    transition: margin-left .5s;
+    padding: 20px;
+    
+}
+
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}

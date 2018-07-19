@@ -1,0 +1,74 @@
+{
+  "Section1": {
+    "Question1": {
+      "id": "11",
+      "statement": "What subset of SQL command is used to manipulate Database structures?",
+      "options": {
+        "option1": "Data Definition Language",
+        "option2": "DML",
+        "option3": "Triggers, jobs, stored procedures",
+        "option4": "none of the above"
+      },
+      "answer": "Data Definition Language"
+    },
+    "Question2": {
+      "id": "12",
+      "statement": "What is the correct HTML for creating hyperlink?",
+      "options": {
+        "option1": "<a name=\"...\"></a>",
+        "option2": "<a> http</a>",
+        "option3": "<a href=\"...\">",
+        "option4": "none of the above"
+      },
+      "answer": "<a href=\"...\">"
+    }
+  },
+  "Section2": {
+    "Question1": {
+      "id": "11",
+      "statement": "What subset of SQL command is used to manipulate Database structures?",
+      "options": {
+        "option1": "Data Definition Language",
+        "option2": "DML",
+        "option3": "Triggers, jobs, stored procedures",
+        "option4": "none of the above"
+      },
+      "answer": "Data Definition Language"
+    },
+    "Question2": {
+      "id": "12",
+      "statement": "What is the correct HTML for creating hyperlink?",
+      "options": {
+        "option1": "<a name=\"...\"></a>",
+        "option2": "<a> http</a>",
+        "option3": "<a href=\"...\">",
+        "option4": "none of the above"
+      },
+      "answer": "<a href=\"...\">"
+    }
+  },
+  "Section3": {
+    "Question1": {
+      "id": "11",
+      "statement": "What subset of SQL command is used to manipulate Database structures?",
+      "options": {
+        "option1": "Data Definition Language",
+        "option2": "DML",
+        "option3": "Triggers, jobs, stored procedures",
+        "option4": "none of the above"
+      },
+      "answer": "Data Definition Language"
+    },
+    "Question2": {
+      "id": "12",
+      "statement": "What is the correct HTML for creating hyperlink?",
+      "options": {
+        "option1": "<a name=\"...\"></a>",
+        "option2": "<a> http</a>",
+        "option3": "<a href=\"...\">",
+        "option4": "none of the above"
+      },
+      "answer": "<a href=\"...\">"
+    }
+  }
+}

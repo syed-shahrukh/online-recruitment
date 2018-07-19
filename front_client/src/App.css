@@ -1,0 +1,10 @@
+.App {
+  text-align: center;
+  height: 97vh;
+}
+footer{
+  display: block;
+  border-top: 2px solid black;
+    padding-left: 600px;
+    width: 100%;
+}

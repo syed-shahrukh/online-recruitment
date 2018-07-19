@@ -1,0 +1,33 @@
+{
+  "name": "xavor-test",
+  "version": "0.1.0",
+  "private": true,
+  
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bootstrap": "^4.1.1",
+    "jquery": "^3.3.1",
+    "load-json-file": "^5.0.0",
+    "popper": "^1.0.1",
+    "react": "^16.4.0",
+    "react-bootstrap": "^0.32.1",
+    "react-bootstrap-table-next": "^0.1.13",
+    "react-breadcrumbs": "^2.1.4",
+    "react-dom": "^16.4.0",
+    "react-html-id": "^0.1.4",
+    "react-responsive-sidebar": "^0.1.16",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.1.4",
+    "react-summernote": "^2.0.0",
+    "react-table": "^6.8.6",
+    "react-tabs": "^2.2.2",
+    "react-toastify": "^4.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:5000"
+}

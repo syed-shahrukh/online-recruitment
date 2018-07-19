@@ -1,0 +1,11 @@
+.verification-link-container{
+    border: 2px solid black;
+    width: 30%;
+    margin: 20% 35%;
+    overflow: hidden;
+    padding: 15px 10px;
+}
+.test-body{
+    width:100%;
+    overflow: hidden;
+}

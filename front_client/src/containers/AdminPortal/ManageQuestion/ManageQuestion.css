@@ -1,0 +1,23 @@
+.current-node{
+    color: #f4c12b;
+}
+.filterbysection-container{
+    float:right;
+    margin-top:5px;
+    margin-left:5px;
+    margin-right: 5px;
+}
+.is-answer-checkbox{
+    margin-top:20px !important;
+}
+.add-answer-field{
+    padding-left: 0px !important;
+}
+.add-answer{
+    margin-bottom: 10px;
+    text-align:right;
+}
+.save-answer{
+    text-align:right;
+    margin-top: 15px;
+}

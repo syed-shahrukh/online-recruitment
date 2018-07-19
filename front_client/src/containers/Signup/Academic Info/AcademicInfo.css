@@ -1,0 +1,63 @@
+.add-record-button {
+    text-align: right !important;
+    float: right;
+    margin-top: 9px !important;
+    margin-right: 16px !important;
+}
+
+.academic-info {
+    width: 100%;
+}
+.academic-wrap{
+    margin-bottom:10px;
+}
+.to-professional-button {
+    float: right;
+    margin-top: 1%;
+    margin-right: 15px;
+    margin-bottom: 3px !important;
+    width: 100px;
+}
+
+.academic-heading {
+    overflow: hidden;
+    padding-left: 15px;
+}
+
+.academic-modal-header {
+    padding-left: 11px;
+}
+
+.heading-title {
+    float: left;
+}
+
+.academic-modal {
+    width: 500px;
+    margin-top: 210px;
+}
+
+.academic-modal-body {
+    padding-left: 10px;
+}
+
+.modal-field {
+    padding-left: 0px;
+    margin-bottom: 15px;
+}
+
+.save-button-container {
+    float: right;
+    width: 150px;
+    margin-right: 30px;
+}
+
+.action-link-buttons {
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+    background-color: transparent;
+    border-color: transparent;
+    color: rgb(51, 122, 183);
+    box-shadow: none;
+}
+

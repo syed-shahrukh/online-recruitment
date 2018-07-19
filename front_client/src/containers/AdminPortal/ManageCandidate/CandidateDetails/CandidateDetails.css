@@ -1,0 +1,13 @@
+.details{
+    text-align: left;
+}
+.hyper-links{
+    background-color: white;
+    text-align: left;
+    margin-bottom: 15px;
+    padding: 5px 5px;
+}
+
+.hyperlink-active a {
+    color: #f4c12b;
+}

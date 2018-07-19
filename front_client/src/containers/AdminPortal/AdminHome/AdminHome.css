@@ -1,0 +1,13 @@
+.bread-crumb{
+    background-color: white;
+    width: 30%;
+    margin-left: 100px;
+    display: block;
+    text-align: left;
+}
+.current-node{
+    color: #f4c12b;
+}
+.demonstration{
+    margin-top:5px;
+}

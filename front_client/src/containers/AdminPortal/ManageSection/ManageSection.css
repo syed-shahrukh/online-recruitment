@@ -1,0 +1,14 @@
+.current-node{
+    color: #f4c12b;
+}
+.section-modal{
+    width:40%;
+    margin-top:15%;
+}
+.mandatory-note{
+    float: left;
+    text-align: left;
+}
+.save-button{
+    float:right;
+}
