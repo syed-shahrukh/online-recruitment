@@ -1,0 +1,25 @@
+{
+  "name": "online-recruitment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt": "^2.0.1",
+    "concurrently": "^3.6.0",
+    "express": "^4.16.3",
+    "joi": "^13.3.0",
+    "joi-objectid": "^2.0.0",
+    "lodash": "^4.17.10",
+    "mongoose": "^5.1.4",
+    "nodemon": "^1.18.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "server": "nodemon index.js",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
