@@ -13,12 +13,14 @@ class ManageSection extends Component {
         axios.get('/api/sections')
             .then( response => {
                 this.setState({sections: response.data});
-                 console.log(response.data)});
+                 });
     }
    
     state = {
         show: false,
+        show_edit_modal: false,
         sections: [],
+        selected_row: {},
         section_name:"",
         question_to_list:null,
         section_description:"",        
@@ -40,13 +42,7 @@ class ManageSection extends Component {
             headerClassName: "table-header-grid",
             show: true
           },
-          {
-            Header: "ID",
-            accessor: "_id",
-           
-           
-            show: true
-          },
+         
           {
             Header: "Action",
             headerClassName: "table-header-grid",
@@ -82,9 +78,16 @@ class ManageSection extends Component {
     handleDeleteOperation = () => {
         console.log("Delete operation function has been called!!!");
     }
+    handleEditModal = () => {
+        const status = !this.state.show_edit_modal;
+        
+        this.setState({show_edit_modal: status});
+    }
     /***************************************************************************************************** */
     handleEditOperation = (row) =>{
-      console.log("id: " + row._id );
+        this.handleEditModal();
+       this.setState({selected_row: row}, () => {console.log("Selected Row: " + this.state.selected_row._id + "\n" + this.state.selected_row.name)});
+      
     }
     /********************************************************************************************************** */
     fillValues = (event) => {
@@ -101,6 +104,29 @@ class ManageSection extends Component {
                 break;
             case "description":
                 this.setState({section_description: value});
+                break;
+            default:
+        };
+    }
+
+    editValues  = (event) => {
+        
+        const name = event.target.name;
+        const value = event.target.value;
+        let updatedRow = this.state.selected_row
+        switch(name){
+            case "section-name":
+                updatedRow.name = value;
+                this.setState({selected_row: updatedRow});
+                
+                break;
+            case "questions-to-list":
+                updatedRow.question_to_list = value;
+                this.setState({selected_row: updatedRow});
+                break;
+            case "description":
+                 updatedRow.description = value;
+                 this.setState({selected_row: updatedRow});
                 break;
             default:
         };
@@ -146,6 +172,46 @@ class ManageSection extends Component {
                 });
                 
     }
+    /****************************************Update Function************************************************** */
+    updateSection = () => {
+        const selectedSection = this.state.selected_row;
+        const id = selectedSection._id;
+        const updatedSection = {
+            name: selectedSection.name,
+            description: selectedSection.description,
+            question_to_list: selectedSection.question_to_list
+        }
+        axios.put(`/api/sections/${id}`, updatedSection)
+        .then(response => {
+            
+            this.handleEditModal();
+            axios.get('/api/sections')
+            .then( response => {
+                this.setState({sections: response.data});
+                 });
+
+        })
+        .catch((error) => {
+            // Error
+            if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            //console.log(error.response.headers);
+            } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+            } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+            }
+            });;
+    }
+
+    /****************************************End of Update Function ***********************************************/
     /***************************** End of Functions****************************************************** */
     render() {
         const fakeData = this.state.sections;
@@ -174,6 +240,7 @@ class ManageSection extends Component {
                 <a onClick={this.handleShow}>  Add a new section</a>
                 </div>
                 </div>
+                {/*************Show Add Modal/************************************************************/}
                             <Modal show={this.state.show} onHide={this.handleClose}>
                                 <Modal.Header closeButton>
                                     <Modal.Title><b>Add new section</b></Modal.Title>
@@ -204,6 +271,7 @@ class ManageSection extends Component {
                                                             name="questions-to-list"
                                                             type="number"
                                                             placeholder="10"
+                                                            
                                                             onChange={this.fillValues}
                                                         />
                                                     </div>
@@ -247,8 +315,78 @@ class ManageSection extends Component {
                                 </Modal.Body>
                                 
                             </Modal>
+                            {/*************End of Show Add Modal/*********************************************/}
            
-                    
+                            <Modal show={this.state.show_edit_modal} onHide={this.handleEditModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title><b>Edit section</b></Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    
+                                        <Form>
+                                            <FormGroup controlId="formBasicText">
+
+                                                <div className="row admin-modal-fields">
+                                                    <div className="col-md-6">
+                                                        <div>
+                                                            <ControlLabel>* Name</ControlLabel>{' '}
+                                                        </div>
+                                                        <FormControl
+                                                            name="section-name"
+                                                            type="text"
+                                                            value={this.state.selected_row.name}
+                                                            placeholder="Part Z"
+                                                            onChange={this.editValues}
+                                                        />
+                                                    </div>
+
+                                                    <div className="col-md-6 admin-modal-fields">
+                                                        <div>
+                                                            <ControlLabel>* Number of Questions to list</ControlLabel>{' '}
+                                                        </div>
+                                                        <FormControl
+                                                            name="questions-to-list"
+                                                            type="number"
+                                                            placeholder="10"
+                                                            value = {this.state.selected_row.question_to_list}
+                                                            onChange={this.editValues}
+                                                        />
+                                                    </div>
+                                                </div>
+
+
+                                                <div className="row admin-modal-fields">
+
+                                                    <div className="col-md-12">
+                                                        <div>
+                                                            <ControlLabel>Description</ControlLabel>
+                                                            {"     "}
+                                                        </div>
+                                                        <FormControl
+                                                            name="description"
+                                                            componentClass="textarea"
+                                                            placeholder="Please Specify"
+                                                            value={this.state.selected_row.description}
+                                                            onChange={this.editValues}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                            </FormGroup>
+
+                                        </Form>
+                                        <div className="row">
+                                        <div className="col-md-8">
+                                        <section className="mandatory-note"><b>Note: All Fields marked with * are mandatory</b></section>
+                                        </div>
+                                        <div className="col-md-4">
+                                        <Button bsClass="normal-style-small" onClick={this.handleEditModal}>Cancel</Button>
+                                        <Button bsClass="xavor-style-small" onClick={this.updateSection}>Save</Button>
+                                        </div>
+                                        </div>
+                                </Modal.Body>
+                                
+                            </Modal>
                     <div className="tabular-data">
                         <ReactTable 
                         className="table-grid"
