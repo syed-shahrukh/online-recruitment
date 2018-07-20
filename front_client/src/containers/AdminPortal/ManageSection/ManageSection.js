@@ -19,6 +19,7 @@ class ManageSection extends Component {
     state = {
         show: false,
         show_edit_modal: false,
+        show_delete_alert:false,
         sections: [],
         selected_row: {},
         section_name:"",
@@ -57,7 +58,7 @@ class ManageSection extends Component {
               </span>
               
               <span>
-              <a onClick={this.handleDeleteOperation}>Delete</a>
+              <a onClick={() => this.handleDeleteOperation(row.original)}>Delete</a>
               </span>
                 
                 
@@ -75,8 +76,19 @@ class ManageSection extends Component {
         this.setState({ show: true });
     }
     /************************************************************************************************* */
-    handleDeleteOperation = () => {
-        console.log("Delete operation function has been called!!!");
+    handleDeleteAlert = () => {
+        const status = !this.state.show_delete_alert;
+        
+        this.setState({show_delete_alert: status});
+    }
+    /************************************************************************************************* */
+    handleDeleteOperation = (row) => {
+        this.handleDeleteAlert();
+        this.setState({selected_row: row,}, () => {
+            
+            console.log("Row to delete: " + this.state.selected_row);
+        } );
+        
     }
     handleEditModal = () => {
         const status = !this.state.show_edit_modal;
@@ -183,8 +195,7 @@ class ManageSection extends Component {
         }
         axios.put(`/api/sections/${id}`, updatedSection)
         .then(response => {
-            
-            this.handleEditModal();
+            this.handleEditModal();            
             axios.get('/api/sections')
             .then( response => {
                 this.setState({sections: response.data});
@@ -212,6 +223,50 @@ class ManageSection extends Component {
     }
 
     /****************************************End of Update Function ***********************************************/
+    /*************************************Delete Function********************************************************* */
+    deleteSection = () => {
+        const selectedSection = this.state.selected_row;
+        const id = selectedSection._id;
+        
+        console.log(id);
+        axios.delete(`/api/sections/${id}`)
+        .then(response => {
+            
+            
+            axios.get('/api/sections')
+            .then( response => {
+                this.setState({sections: response.data});
+                this.handleDeleteAlert();
+                 });
+
+        })
+        .catch((error) => {
+            // Error
+            if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            //console.log(error.response.headers);
+            } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+            } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+            }
+            });;
+    }
+    
+    
+    
+    
+    
+    
+    
+    /************************************************************************************************************ */
     /***************************** End of Functions****************************************************** */
     render() {
         const fakeData = this.state.sections;
@@ -316,7 +371,7 @@ class ManageSection extends Component {
                                 
                             </Modal>
                             {/*************End of Show Add Modal/*********************************************/}
-           
+{/********************************************** Show Edit Modal*************************************************/}                            
                             <Modal show={this.state.show_edit_modal} onHide={this.handleEditModal}>
                                 <Modal.Header closeButton>
                                     <Modal.Title><b>Edit section</b></Modal.Title>
@@ -387,6 +442,34 @@ class ManageSection extends Component {
                                 </Modal.Body>
                                 
                             </Modal>
+{/**********************************************End Show Edit Modal*************************************************/}                                                        
+{/**********************************************Confirm Delete Modal**************************************************/}
+                    <Modal show={this.state.show_delete_alert} onHide={this.handleDeleteAlert}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title><b>Confirm Delete?</b></Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                        <p>Are you sure you want to delete <b>{this.state.selected_row.name}</b> Section?</p>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                    <div className="col-md-12">
+                                    <Button bsClass="normal-style-small" onClick={this.handleDeleteAlert}>No</Button>
+                                    <Button bsClass="xavor-style-small" onClick={this.deleteSection}>Yes</Button>
+                                    </div>
+                                    </div>
+                                </Modal.Body>
+                                
+                            </Modal>
+{/********************************************End of Confirm Delete Modal********************************************/}
+                    
+                    
+                    
+                    
+                    
                     <div className="tabular-data">
                         <ReactTable 
                         className="table-grid"

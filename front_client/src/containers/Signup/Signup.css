@@ -72,6 +72,7 @@
     
 }
 .xavor-style-small{
+    min-width: 50px;
     background-color: #f4c12b;
     color: white;
     margin-left: 1%;
@@ -99,6 +100,7 @@
 }
 .normal-style-small{
     margin-left: 1%;
+    min-width: 50px;
     padding: 5px 5px;
     margin-bottom: 0;
     font-size: 14px;
