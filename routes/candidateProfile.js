@@ -14,17 +14,18 @@ router.post('/', async (req, res) => {
 
   let candidate = new CandidateProfile(
     {
-        fullName: req.body.fullName,
-        fatherHusbandName: req.body.fatherHusbandName,
-        cnic: req.body.cnic,
-        dob: req.body.dob,
-        gender: req.body.gender,
-        maritalStatus: req.body.maritalStatus,
-        mobilePhone: req.body.mobilePhone,
-        homePhone: req.body.homePhone,
-        positionApplied: req.body.positionApplied,
-        currentAddress: req.body.currentAddress,
-        permanentAddress: req.body.permanentAddress
+      userId: req.body.userId,  
+      fullName: req.body.fullName,
+      fatherHusbandName: req.body.fatherHusbandName,
+      cnic: req.body.cnic,
+      dob: req.body.dob,
+      gender: req.body.gender,
+      maritalStatus: req.body.maritalStatus,
+      mobilePhone: req.body.mobilePhone,
+      homePhone: req.body.homePhone,
+      positionApplied: req.body.positionApplied,
+      currentAddress: req.body.currentAddress,
+      permanentAddress: req.body.permanentAddress
     });
 
   await candidate.save();
