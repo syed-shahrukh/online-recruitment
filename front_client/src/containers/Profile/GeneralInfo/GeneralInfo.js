@@ -12,84 +12,95 @@ import Aux from "../../Auxilary/Auxilary";
 
 class GeneralInfo extends Component {
   state = {
-    name: '',
-    fathername: '',
-    cnic: '',
-    dob:'',
-    gender:'',
-    marital:'',
-    email:'',
-    mobile:'',
-    homephone:'',
-    current_address:'',
-    permanent_address:'',
-    position_applied:'',
-    salary_expected:'',
-    employment_desired: '',
-    expected_joining:''
+    userGeneralInfo: {
+      name: '',
+      fathername: '',
+      cnic: '',
+      dob:'',
+      gender:'',
+      marital:'',
+      mobile:'',
+      homephone:'',
+      current_address:'',
+      permanent_address:'',
+      position_applied:''
+    }
+    
+    
+    
   };
 
   fillValues = (event) => {
     const name = event.target.name;
     const value = event.target.value;
+    let userGeneralInfo = {...this.state.userGeneralInfo};
     switch(name){
       case "name":
-        this.setState({name: value});
+        userGeneralInfo.name = value;
+        this.setState({userGeneralInfo});
         break;
       
       case "father-name":
-      this.setState({fathername: value});
+      userGeneralInfo.fathername = value;
+      this.setState({userGeneralInfo});
       break;
       
       case "cnic-no":
-      this.setState({cnic: value});
+      userGeneralInfo.cnic = value;
+      this.setState({userGeneralInfo});
       break;
 
       case "dob":
-      this.setState({dob: value});
+      userGeneralInfo.dob = value;
+      this.setState({userGeneralInfo});
       break;
 
       case "gender":
-        this.setState({gender: value});
+      userGeneralInfo.gender = value;
+      this.setState({userGeneralInfo});
         break;
       case "Marital Status":
-        this.setState({marital: value});
+      userGeneralInfo.marital = value;
+      this.setState({userGeneralInfo});
         break;
-      case "email":
-        this.setState({email: value});
-        break;
+      
       case "mobile-no":
-        this.setState({mobile: value});
+      userGeneralInfo.mobile = value;
+      this.setState({userGeneralInfo});
         break;
       case "home-phone":
-        this.setState({homephone: value});
+      userGeneralInfo.homephone = value;
+      this.setState({userGeneralInfo});
         break;
       case "curr-address":
-        this.setState({current_address: value});
+        userGeneralInfo.current_address = value;
+      this.setState({userGeneralInfo});
         break;
       case "permanent-address":
-        this.setState({permanent_address: value});
+        userGeneralInfo.permanent_address = value;
+      this.setState({userGeneralInfo});
         break;
-      case "expected-salary":
-        this.setState({salary_expected: value});
-        break;
+      
       case "joining":
-        this.setState({expected_joining: value});
+        userGeneralInfo.expected_joining = value;
+      this.setState({userGeneralInfo});
         break;
       case "position":
-        this.setState({position_applied: value});
+        userGeneralInfo.position_applied = value;
+      this.setState({userGeneralInfo});
         break;
-      case "employment-desired":
-        this.setState({employment_desired: value})
-        break;
+     
         
       default:
-        
+        console.log("User Id is: " + this.state.id);
     }
-
-   
   }
+  submitValues = () => {
+    
+    
+    
 
+  }
   render() {
     return (
       <Aux>
@@ -141,6 +152,7 @@ class GeneralInfo extends Component {
                 type="text"
                 placeholder="xxxxx-xxxxxxx-x"
                 className="cnic"
+                onChange={this.fillValues}
               />
             </div>
           </div>
@@ -235,8 +247,9 @@ class GeneralInfo extends Component {
               placeholder="Select"
               onChange={this.fillValues}
             >
-              <option value="software">Software Engineer</option>
-              <option value="qualityassurance">
+              <option value="Not Selected">Please Select</option>
+              <option value="Software Engineer">Software Engineer</option>
+              <option value="Quality Assurance Engineer">
                 Quality Assurance Engineer
               </option>
             </FormControl>
@@ -278,7 +291,7 @@ class GeneralInfo extends Component {
             </section>
             </div>
             <div className="col-md-6">
-          <Button className="to-academic-button" bsClass="xavor-style" onClick={this.props.click}>Next</Button>
+          <Button className="to-academic-button" bsClass="xavor-style" onClick={() => { this.props.recieve(this.state.userGeneralInfo) }}>Next</Button>
           </div>
           </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Signup.css';
+import './Profile.css';
 import Navbar from '../Navbar/Navbar';
 import Aux from '../Auxilary/Auxilary';
 import { Tab, Tabs } from 'react-bootstrap';
@@ -9,7 +9,8 @@ import ProfessionalInfo from './Professional Info/ProfessionalInfo';
 import References from './References/References';
 
 
-class Signup extends Component {
+
+class Profile extends Component {
 
     constructor(props, context) {
         super(props, context);
@@ -17,8 +18,16 @@ class Signup extends Component {
         this.handleSelect = this.handleSelect.bind(this);
 
         this.state = {
-            key: 1
+            key: 1,
+            location : this.props.location.state && this.props.location.state.userId,
+            userId: "5b56ca115a43e31ba0be9cd1"
         };
+    }
+    childInformation(information){
+        const generalInformation = information;
+    }
+    componentDidMount(){
+        console.log("This user_id is: ");
     }
 
     handleSelect(key) {
@@ -39,7 +48,8 @@ class Signup extends Component {
                     <Tab eventKey={1} title="General Information" >
                         
 
-                        <GeneralInfo click={() => this.handleSelect(2)} />
+                        <GeneralInfo recieve={(data) => {this.childInformation (data)}}
+                                    click={() => this.handleSelect(2)} />
                     </Tab>
 
                     <Tab eventKey={2} title="Academic Information">
@@ -64,4 +74,4 @@ class Signup extends Component {
 };
 
 
-export default Signup;
+export default Profile;
