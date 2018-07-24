@@ -15,16 +15,24 @@ import { Redirect } from 'react-router-dom';
 
 class Login extends Component {
   state ={
+    email_regex: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    
     signup_status: false,
     signup_email: "",
     signup_password: "",
-    signup_confirm_password: ""
+    signup_confirm_pass: "",
+    signup_name: "",
+    signup_confirm_password: "",
+    active_user: null
 
   };
   fillSignupInfo = (event) => {
     const value = event.target.value;
     const name = event.target.name;
     switch (name) {
+      case "signup-name":
+        this.setState({signup_name: value});
+        break;
       case "signup-email":
         this.setState({signup_email: value});
         break;
@@ -41,16 +49,54 @@ class Login extends Component {
   };
   signupUser = () => {
     const user = {
+      
       email: this.state.signup_email,
       password: this.state.signup_password
     }
     axios.post('/api/users/signup', user)
         .then(response => {
-            console.log("User Created successfully: " + response);
-            this.setState({signup_status: true});
+            const user_id = response.data._id;
+            console.log("User Created successfully: " + response.data + "\nAnd the Id of user is: " + user_id);
+            this.setState({signup_status: true, active_user: user_id});
+            if(this.state.signup_status){
+              const path = `/profile/$:{user_id}`;
+              <Redirect to={{
+                pathname: {path},
+                state: { userId: this.state.active_user }
+              }} />
+            }
             
-        })
+        }).catch((error) => {
+          // Error
+          if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          //console.log(error.response.headers);
+          } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+          } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+          }
+          });
   }
+  getEmailValidation = () => {
+    const regex = this.state.email_regex;
+    const email = this.state.signup_email;
+    if (regex.test(email)){
+      return 'success';
+    }
+    else{
+      return 'error';
+    }
+  }
+
+
   
   render() {
    
@@ -118,15 +164,15 @@ class Login extends Component {
                 <div className="col-md-12">
                   <FormGroup bsSize="large" >
                     <ControlLabel>Name</ControlLabel>{'    '}
-                    <FormControl type="text" placeholder="Jane Doe" />
+                    <FormControl name="signup-name" type="text" placeholder="Jane Doe" />
                   </FormGroup>{' '}
                 </div>
               </div>
               <div className="row">
                 <div className="col-md-12">
-                  <FormGroup bsSize="large" controlId="formInlineEmail" >
+                  <FormGroup bsSize="large" controlId="formInlineEmail" validationState={this.getEmailValidation()} >
                     <ControlLabel>Email</ControlLabel>{'    '}
-                    <FormControl onChange={this.fillSignupInfo} name="signup-email" type="email" placeholder="jane.doe@example.com" />
+                    <FormControl  onChange={this.fillSignupInfo} name="signup-email" type="email" placeholder="jane.doe@example.com" />
                   </FormGroup>{' '}
                 </div>
               </div>
@@ -134,15 +180,15 @@ class Login extends Component {
                 <div className="col-md-12">
                   <FormGroup bsSize="large">
                     <ControlLabel>Password</ControlLabel>{'    '}
-                    <FormControl onChange={this.fillSignupInfo} name="signup-password" type="password" placeholder="Enter your password" />
+                    <FormControl onChange={this.fillSignupInfo}  name="signup-password" type="password" placeholder="Enter your password" />
                   </FormGroup>{' '}
                 </div>
               </div>
               <div className="row">
                 <div className="col-md-12">
-                  <FormGroup bsSize="large">
+                  <FormGroup validationState={this.state.signup_password === "" ? "error" : this.state.signup_password === this.state.signup_confirm_password  ? "success" : "error"} bsSize="large">
                     <ControlLabel>Confirm Password</ControlLabel>{'    '}
-                    <FormControl onChange={this.fillSignupInfo} name="signup-confirm-password" type="password" placeholder="Confirm your password" />
+                    <FormControl onChange={this.fillSignupInfo}  name="signup-confirm-password" type="password" placeholder="Confirm your password" />
                   </FormGroup>{' '}
                 </div>
                 

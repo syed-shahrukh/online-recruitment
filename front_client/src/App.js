@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Login from './containers/Login/Login';
 import Aux from './containers/Auxilary/Auxilary';
-import Signup from './containers/Signup/Signup';
+import Profile from './containers/Profile/Profile';
 import CandidateTest from './containers/CandidateTest/CandidateTest';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './App.css';
@@ -20,7 +20,7 @@ class App extends Component {
       <Router >
         <div className="App">
           <Route path="/" exact component={Login} />
-          <Route path="/signup" exact component={Signup} />
+          <Route path={`/profile/`} exact component={Profile} />
           <Route path={"/candidate-test"} component={CandidateTest}/>
            <Route path={"/admin-portal/home/"} component={AdminPortal}/>   
         </div>
