@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './Profile.css';
+import axios from 'axios';
 import Navbar from '../Navbar/Navbar';
 import Aux from '../Auxilary/Auxilary';
 import { Tab, Tabs } from 'react-bootstrap';
@@ -25,6 +26,10 @@ class Profile extends Component {
     }
     childInformation(information){
         const generalInformation = information;
+        axios.post('api/CandidateProfile/' , generalInformation)
+            .then(response => {
+                console.log(response);
+            })
     }
     componentDidMount(){
         console.log("This user_id is: ");
@@ -48,23 +53,27 @@ class Profile extends Component {
                     <Tab eventKey={1} title="General Information" >
                         
 
-                        <GeneralInfo recieve={(data) => {this.childInformation (data)}}
+                        <GeneralInfo id={this.state.userId}
                                     click={() => this.handleSelect(2)} />
                     </Tab>
 
                     <Tab eventKey={2} title="Academic Information">
                         
-                        <AcademicInfo click={() => this.handleSelect(3)}
+                        <AcademicInfo id={this.state.userId}
+                                      click={() => this.handleSelect(3)}
                                       prev={() => this.handleSelect(1)} />
                     </Tab>
                     <Tab eventKey={3} title="Professional Information" >
                         
-                        <ProfessionalInfo click={() => this.handleSelect(4)}
+                        <ProfessionalInfo 
+                        id={this.state.userId}
+                        click={() => this.handleSelect(4)}
                         prev={() => this.handleSelect(2)} />
                     </Tab>
                     <Tab eventKey={4} title="References" >
 
-                        <References click={() => this.handleSelect(5)}
+                        <References id={this.state.userId}
+                        click={() => this.handleSelect(5)}
                         prev={() => this.handleSelect(3)} />
                     </Tab>
                 </Tabs>;
