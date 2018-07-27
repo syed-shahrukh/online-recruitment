@@ -1,34 +1,49 @@
 import React, { Component } from 'react';
 import Aux from '../../Auxilary/Auxilary';
 import { Breadcrumb, Button, ButtonToolbar,DropdownButton, MenuItem, FormGroup ,ControlLabel,FormControl, Checkbox, Modal, Form } from 'react-bootstrap';
-import RichTextEditor from '../../../components/TextEditor';
+import ReactSummernote from 'react-summernote';
+import 'react-summernote/dist/react-summernote.css'; // import styles
+import 'bootstrap/dist/js/bootstrap.bundle';
 import ReactTable from 'react-table';
 import './ManageQuestion.css';
+import axios from 'axios';
 
 const fakeData = [
-    { statement: "Who are you?", section: 'Part A' },
-    { statement: "What are you?", section: 'Part A' },
-    { statement: "Why are you?", section: 'Part A' },
-    { statement: "Who's the boss?", section: 'Part A' },
-    { statement: "Do you like React?", section: 'Part B' },
-    { statement: "Do you like Node Js?", section: 'Part B' },
-    { statement: "When did something start out badly for you but\r in the end it was great?", section: 'Part C' },
-    { statement: "What are some red flags to watch out for in daily life?", section: 'Part A' },
-    { statement: "Where do you get your news?", section: 'Part A' },
-    { statement: "What’s wrong but sounds right?", section: 'Part A' },
-    { statement: "What’s the most epic way you’ve seen someone quit or be fired?", section: 'Part A' },
-    { statement: "What food have you never eaten but would really like to try?", section: 'Part C' },
-    { statement: "Which celebrity do you think is the most down to earth?", section: 'Part C' },
-    { statement: "What’s the spiciest thing you’ve ever eaten?", section: 'Part B' },
-    { statement: "What’s the most expensive thing you’ve broken?", section: 'Part B' },
-    { statement: "What’s the most expensive thing you’ve broken?", section: 'Part B' }
+    
   ];
   const add_answer_fakeData = [
     { statement: "Data Object Model", answer: 'false' },
     { statement: "Data Oriented Model", answer: 'false' }
   ];
 class ManageQuestion extends Component{
+  componentDidMount(){
+    axios.get('/api/sections/')
+    .then(response => {
+      const section = response.data
+      this.setState({sectionToList: section}, () => {console.log(this.state.sectionToList)});
+    })
+    .catch((error) => {
+      // Error
+      if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data);
+      console.log(error.response.status);
+      //console.log(error.response.headers);
+      } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log(error.request);
+      } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+      }
+      });;
+  }
     state = {
+        sectionToList: [],
+        statement: '',
         parent_show: false,
         child_show: false,
         graphic_content: false,
@@ -115,7 +130,9 @@ class ManageQuestion extends Component{
           }
         ]
       };
-    /***************************** Functions****************************************************** */
+    
+    
+      /***************************** Functions****************************************************** */
     handleClose = () => {
         this.setState({ parent_show: false });
     }
@@ -148,6 +165,12 @@ class ManageQuestion extends Component{
     }
     summerNote = (content) => {
       console.log(content);
+    }
+
+    fillValue = (event) => {
+      const statement = event;
+      this.setState({statement: statement}, () => {console.log(this.state.statement);});
+      
     }
     
     render(){
@@ -194,7 +217,7 @@ class ManageQuestion extends Component{
                     </div>
                    
                     <div className="tabular-data">
-                        <ReactTable className="table-grid" data={fakeData} minRows={0} columns={this.state.columns} />
+                        <ReactTable className="table-grid" showPagination={false} data={fakeData} minRows={0} columns={this.state.columns} />
                     </div>
                 </div>
 {/******************************************Modals****************************************************************/}
@@ -216,8 +239,25 @@ class ManageQuestion extends Component{
                         <div>
                           <ControlLabel>Statement</ControlLabel>{" "}
                         </div>
-                        <RichTextEditor/>
-                
+                        
+                        <ReactSummernote
+                        value={this.state.statement}
+                        options={{
+                          height: 50,
+                          dialogsInBody: true,
+                          toolbar: [
+                            ['style', ['style']],
+                            ['font', ['bold', 'underline', 'clear']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['view', [ 'codeview']]
+                          ],
+                          codemirror: {
+                            theme: 'monokai'
+                          }
+                        
+                        }}
+                        onChange={this.fillValue}
+                      />
                       
                       </div>
                       
@@ -245,6 +285,7 @@ class ManageQuestion extends Component{
                         </div>
     
                         <FormControl componentClass="select" placeholder="select">
+                          {}
                           <option value="section1">Section 1</option>
                           <option value="section2">Section 2</option>
                           <option value="section3">Section 3</option>

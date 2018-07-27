@@ -60,10 +60,7 @@ class Login extends Component {
             this.setState({signup_status: true, active_user: user_id});
             if(this.state.signup_status){
               const path = `/profile/$:{user_id}`;
-              <Redirect to={{
-                pathname: {path},
-                state: { userId: this.state.active_user }
-              }} />
+              <Redirect to={{ pathname: {path}, state: { userId: this.state.active_user }}} />
             }
             
         }).catch((error) => {

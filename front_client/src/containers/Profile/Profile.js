@@ -23,9 +23,7 @@ class Profile extends Component {
             userId: "5b56ca115a43e31ba0be9cd1"
         };
     }
-    childInformation(information){
-        const generalInformation = information;
-    }
+
     componentDidMount(){
         console.log("This user_id is: ");
     }
