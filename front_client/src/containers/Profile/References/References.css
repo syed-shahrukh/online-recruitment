@@ -37,8 +37,8 @@
     margin-top: 5px;
 }
 .references-save-button-container{
-    width: 120px;
-    float: right;
+    overflow: hidden;
+    text-align: right;
     margin-right: 15px;
 }
 .next-button {

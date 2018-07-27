@@ -4,8 +4,8 @@ import { Modal, Button, FormControl, FormGroup, Form, ControlLabel, Radio } from
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import './References.css';
-
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 
 
@@ -18,21 +18,26 @@ class References extends Component {
     /*************************************************ROWS to show in table******************************************************/
     state = {
         show: false,
+        selected_record: {},
+        show_delete_alert: false,
+        show_edit_modal: false,
         record: {
+            userId: this.props.id,
             name: '',
-            telephone: '',
+            phone: '',
             relationship: '',
-            yearsknown: '',
+            yearsKnown: '',
             notified: ''
             
         },
-        records: [{
-            name: '',
-            telephone: '',
-            relationship: '',
-            yearsknown: '',
-            notified: '',
-        },]
+        records: []
+    }
+    componentDidMount(){
+        axios.get('api/referenceinfo/')
+        .then(response => {
+            
+            this.setState({records: response.data});
+        })
     }
     /*************************************************Functions******************************************************/
     handleClose = () => {
@@ -57,10 +62,10 @@ class References extends Component {
           break;
 
       case "yearsknown":
-      record.yearsknown = value
+      record.yearsKnown = value
       break;
       case "telephone":
-        record.telephone = value;
+        record.phone = value;
       break;
       case "notified":
         record.notified = value;
@@ -68,22 +73,168 @@ class References extends Component {
       default:
     }
     this.setState({record: record})
-    console.log(this.state);
     }
+
 
     addRecord = () => {
         const record = this.state.record;
-        const allRecords = this.state.records;
-        allRecords.push(record);
-        this.setState({records: allRecords});
-        console.log("Showing values of record from state: \n");
-        console.log(this.state.record);
-        console.log("Showing values of all records array from state: \n");
-        console.log(this.state.records);
-        this.handleClose();
-      
-        
+        axios.post('api/referenceinfo/', record)
+            .then(response => {
+                console.log(response.data);
+                axios.get('api/referenceinfo/')
+                .then(response => {
+                    this.setState({records: response.data});
+                })
+            })
 
+        
+        
+        this.handleClose();
+
+
+    }
+
+    handleDeleteAlert = () => {
+        const status = !this.state.show_delete_alert;
+        
+        this.setState({show_delete_alert: status});
+    }
+    /************************************************************************************************* */
+    handleDeleteOperation = (row) => {
+        this.handleDeleteAlert();
+        this.setState({selected_record: row,}, () => {
+            
+            console.log("Row to delete: ");
+            console.log(this.state.selected_record);
+        } );
+        
+    }
+
+
+    handleEditModal = () => {
+
+        const status = !this.state.show_edit_modal;
+        
+        this.setState({show_edit_modal: status});
+    }
+
+
+    /***************************************************************************************************** */
+    handleEditOperation = (row) =>{
+        this.handleEditModal();
+       this.setState({selected_record: row}, () => {console.log("Selected Row: " + this.state.selected_record._id + "\n")});
+      
+    }
+
+
+      /****************************************Update Function************************************************** */
+      editValues  = (event) => {
+        
+        const name = event.target.name;
+        const value = event.target.value;
+        let updatedRecord = this.state.selected_record
+        switch(name){
+            case "name":
+                updatedRecord.name = value;
+                this.setState({selected_record: updatedRecord});
+                
+                break;
+            case "relationship":
+                updatedRecord.relationship = value;
+                this.setState({selected_record: updatedRecord});
+                break;
+            case "yearsknown":
+                 updatedRecord.yearsKnown = value;
+                 this.setState({selected_record: updatedRecord});
+                break;
+            case "telephone":
+                updatedRecord.phone = value;
+                this.setState({selected_record: updatedRecord});
+               break;
+            case "notified":
+               updatedRecord.notified = value;
+               this.setState({selected_record: updatedRecord});
+              break;
+            default:
+        };
+    }
+     
+      updateRecord = () => {
+        const selectedRecord = this.state.selected_record;
+        const id = selectedRecord._id;
+        const updatedRecord = {
+            userId: selectedRecord.userId,
+            name: selectedRecord.name,
+            relationship: selectedRecord.relationship,
+            yearsKnown: selectedRecord.yearsKnown,
+            phone: selectedRecord.phone,
+            notified: selectedRecord.notified
+        }
+        axios.put(`/api/referenceinfo/${id}`, updatedRecord)
+        .then(response => {
+            this.handleEditModal();            
+            axios.get('/api/referenceinfo/')
+            .then( response => {
+                this.setState({records: response.data});
+                 });
+
+        })
+        .catch((error) => {
+            // Error
+            if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            //console.log(error.response.headers);
+            } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+            } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+            }
+            });;
+    }
+
+    /****************************************End of Update Function ***********************************************/
+    /*************************************Delete Function********************************************************* */
+    deleteRecord = () => {
+        const selectedRecord = this.state.selected_record;
+        const id = selectedRecord._id;
+        
+        console.log(id);
+        axios.delete(`/api/referenceinfo/${id}`)
+        .then(response => {
+            
+            
+            axios.get('/api/referenceinfo/')
+            .then( response => {
+                this.setState({records: response.data});
+                this.handleDeleteAlert();
+                 });
+
+        })
+        .catch((error) => {
+            // Error
+            if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            //console.log(error.response.headers);
+            } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+            } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+            }
+            });;
     }
     /*************************************************End of Functions******************************************************/
     render() {
@@ -97,7 +248,7 @@ class References extends Component {
         },{
             Header: 'Telephone',
             headerClassName: "table-header-grid",
-            accessor: 'telephone' // String-based value accessors!
+            accessor: 'phone' // String-based value accessors!
         },
         {
             Header: 'Relationship to you',
@@ -107,13 +258,24 @@ class References extends Component {
         {
             Header: 'Years they have known you',
             headerClassName: "table-header-grid",
-            accessor: 'yearsknown',
+            accessor: 'yearsKnown',
 
         },
         {
             Header: 'Notified?',
             headerClassName: "table-header-grid",
-            accessor: 'notified'
+            accessor: 'notified',
+            show: false
+        },
+        {
+            Header: 'Action',
+            headerClassName: "table-header-grid",
+            Cell: row => (
+                <div>
+                    <a onClick={() => this.handleEditOperation(row.original)}>Edit</a> | 
+                    <a onClick={() => this.handleDeleteOperation(row.original)}>Delete</a>             
+                </div>
+              )
         }
         ]
         return (
@@ -127,7 +289,7 @@ class References extends Component {
                         <a onClick={this.handleShow}>  Add a new reference</a>
                     </div>
                     </div>
-                            
+{/***********************************************Add Record Modal*****************************************************************************/}
                             <Modal dialogClassName="references-modal" className="Popup" show={this.state.show} onHide={this.handleClose}>
                                 <Modal.Header closeButton>
                                     <Modal.Title><b>Add new reference</b></Modal.Title>
@@ -200,10 +362,10 @@ class References extends Component {
                                                     <ControlLabel>Have they been notified that we will contact them for verification?</ControlLabel>{' '}
                                                 </div>
                                                 <FormGroup className="Radio">
-                                                    <Radio onClick={this.fillValues} name="notified" value="Yes" inline>
+                                                    <Radio onClick={this.fillValues} name="notified" value="true" inline>
                                                         Yes
                                                     </Radio>{' '}
-                                                    <Radio onClick={this.fillValues} name="notified" value="No" inline>
+                                                    <Radio onClick={this.fillValues} name="notified" value="false" inline>
                                                         No
                                                     </Radio>{' '}
                                                 </FormGroup>
@@ -230,10 +392,148 @@ class References extends Component {
                                 </div>
                                 </Modal.Body>
                             </Modal>
+
+{/*****************************************End of Add Record Modal*****************************************************************************/}
+
+
+{/***********************************************Edit Record Modal*****************************************************************************/}
+                            <Modal  show={this.state.show_edit_modal} onHide={this.handleEditModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title><b>Update Record</b></Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                <div className="container-fluid references-modal-body">
+                                <Form className="academic-info">
+                                    <FormGroup controlId="formBasicText">
+                                        <div className="row">
+                                            <div className="col-md-6 references-field">
+                                                <div>
+                                                    <ControlLabel>Name</ControlLabel>{' '}
+                                                </div>
+                                                <FormControl
+                                                    name="name"
+                                                    type="text"
+                                                    placeholder="McGille University"
+                                                    value={this.state.selected_record.name}
+                                                    onChange = {this.editValues}
+                                                />    
+                                            </div>
+                                            <div className="col-md-6 references-field">
+                                            <div>
+                                                <ControlLabel>Relationship to you</ControlLabel>
+                                                {"     "}
+                                            </div>
+                                            <FormControl
+                                                name="relationship"
+                                                type="text"
+                                                placeholder="Example: Professor"
+                                                value={this.state.selected_record.relationship}
+                                                onChange = {this.editValues}
+                                            />
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-md-6 references-field">
+                                                <div>
+                                                    <ControlLabel>Telephone</ControlLabel>{' '}
+                                                </div>
+                                                <FormControl
+                                                    name="telephone"
+                                                    type="text"
+                                                    placeholder="090078601"
+                                                    value={this.state.selected_record.phone}
+                                                    onChange = {this.editValues}
+                                                />    
+                                            </div>
+                                            <div className="col-md-6 references-field">
+                                            <div>
+                                                <ControlLabel>Years they have known you</ControlLabel>
+                                                {"     "}
+                                            </div>
+                                            <FormControl
+                                                className="years"
+                                                name="yearsknown"
+                                                type="number"
+                                                placeholder="1"
+                                                value={this.state.selected_record.yearsKnown}
+                                                onChange = {this.editValues}
+                                            />
+                                            </div>
+                                        </div>
+
+
+
+
+
+
+                                        <div className="row">
+                                            <div className="col-md-12 references-field">
+                                                <div>
+                                                    <ControlLabel>Have they been notified that we will contact them for verification?</ControlLabel>{' '}
+                                                </div>
+                                                <FormGroup className="Radio">
+                                                    <Radio onClick={this.editValues} name="notified" value="true" inline>
+                                                        Yes
+                                                    </Radio>{' '}
+                                                    <Radio onClick={this.editValues} name="notified" value="false" inline>
+                                                        No
+                                                    </Radio>{' '}
+                                                </FormGroup>
+                                            </div>
+                                            
+
+
+                                        </div>
+                                        
+                                    </FormGroup>
+                                    
+                                </Form>
+
+                                </div>
+
+                                <div className="row">
+                                <div className="col-md-6">
+                                <section className="mandatory-note"><b>* All fields are mandatory</b></section>
+                                </div>
+                                <div className="references-save-button-container">
+                                <Button bsClass="normal-style-small" onClick={this.handleEditModal}>Cancel</Button>
+                                <Button bsClass="xavor-style-small" onClick={this.updateRecord}>Update</Button>
+                                </div>
+                                </div>
+                                </Modal.Body>
+                            </Modal>
+
+{/***********************************************End of Record Modal*****************************************************************************/}
+      {/**********************************************Confirm Delete Modal**************************************************/}
+      <Modal show={this.state.show_delete_alert} onHide={this.handleDeleteAlert}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title><b>Confirm Delete?</b></Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                        <p>Are you sure you want to delete this record?</p>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                    <div className="col-md-12">
+                                    <Button bsClass="normal-style-small" onClick={this.handleDeleteAlert}>No</Button>
+                                    <Button bsClass="xavor-style-small" onClick={this.deleteRecord}>Yes</Button>
+                                    </div>
+                                    </div>
+                                </Modal.Body>
+                                
+                            </Modal>
+{/**********************************************End of Confirm Delete Modal**************************************************/}
+
+
                     <div className="container-fluid">
                     <ReactTable
                         className="data-table"
                         data={this.state.records}
+                        showPagination={false}
                         columns={columns}
                         defaultPageSize={5}
                     />

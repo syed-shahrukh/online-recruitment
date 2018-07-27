@@ -8,98 +8,120 @@ import {
   Button
 } from "react-bootstrap";
 import "./GeneralInfo.css";
+import axios from 'axios';
 import Aux from "../../Auxilary/Auxilary";
 
 class GeneralInfo extends Component {
   state = {
     userGeneralInfo: {
-      name: '',
-      fathername: '',
+      userId: this.props.id,
+      fullName: '',
+      fatherHusbandName: '',
       cnic: '',
       dob:'',
       gender:'',
-      marital:'',
-      mobile:'',
-      homephone:'',
-      current_address:'',
-      permanent_address:'',
-      position_applied:''
+      maritalStatus:'',
+      mobilePhone:'',
+      homePhone:'',
+      currentAddress:'',
+      permanentAddress:'',
+      positionApplied:''
     }
     
     
     
   };
 
+
+  submitProfileInformation = () => {
+    const user = this.state.userGeneralInfo;
+    axios.post('api/candidates/', user)
+    .then(response => {
+      console.log(response.data);
+      this.props.click();
+      
+    })
+    .catch((error) => {
+      // Error
+      if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data);
+      console.log(error.response.status);
+      //console.log(error.response.headers);
+      } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log(error.request);
+      } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+      }
+      });;
+  };
   fillValues = (event) => {
     const name = event.target.name;
     const value = event.target.value;
-    let userGeneralInfo = {...this.state.userGeneralInfo};
+    let record = this.state.userGeneralInfo
     switch(name){
       case "name":
-        userGeneralInfo.name = value;
-        this.setState({userGeneralInfo});
+        record.fullName = value;
+        
         break;
       
       case "father-name":
-      userGeneralInfo.fathername = value;
-      this.setState({userGeneralInfo});
+      record.fatherHusbandName = value;
+      
       break;
       
       case "cnic-no":
-      userGeneralInfo.cnic = value;
-      this.setState({userGeneralInfo});
+      record.cnic = value;
+      
       break;
 
       case "dob":
-      userGeneralInfo.dob = value;
-      this.setState({userGeneralInfo});
+      record.dob = value;
+      
       break;
 
       case "gender":
-      userGeneralInfo.gender = value;
-      this.setState({userGeneralInfo});
+      record.gender = value;
+      
         break;
       case "Marital Status":
-      userGeneralInfo.marital = value;
-      this.setState({userGeneralInfo});
+      record.maritalStatus = value;
+      
         break;
       
       case "mobile-no":
-      userGeneralInfo.mobile = value;
-      this.setState({userGeneralInfo});
+      record.mobilePhone = value;
+      
         break;
       case "home-phone":
-      userGeneralInfo.homephone = value;
-      this.setState({userGeneralInfo});
+      record.homePhone = value;
+      
         break;
       case "curr-address":
-        userGeneralInfo.current_address = value;
-      this.setState({userGeneralInfo});
+      record.currentAddress = value;
+      
         break;
       case "permanent-address":
-        userGeneralInfo.permanent_address = value;
-      this.setState({userGeneralInfo});
-        break;
+      record.permanentAddress = value;
       
-      case "joining":
-        userGeneralInfo.expected_joining = value;
-      this.setState({userGeneralInfo});
         break;
       case "position":
-        userGeneralInfo.position_applied = value;
-      this.setState({userGeneralInfo});
+      record.positionApplied = value;
+      
         break;
      
         
       default:
-        console.log("User Id is: " + this.state.id);
+        
     }
-  }
-  submitValues = () => {
-    
-    
-    
-
+    this.setState({userGeneralInfo: record}, () => {
+      console.log(this.state.userGeneralInfo);
+    });
   }
   render() {
     return (
@@ -291,7 +313,7 @@ class GeneralInfo extends Component {
             </section>
             </div>
             <div className="col-md-6">
-          <Button className="to-academic-button" bsClass="xavor-style" onClick={() => { this.props.recieve(this.state.userGeneralInfo) }}>Next</Button>
+          <Button className="to-academic-button" bsClass="xavor-style" onClick={this.submitProfileInformation}>Next</Button>
           </div>
           </div>
           </div>
