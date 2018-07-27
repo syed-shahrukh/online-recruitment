@@ -262,10 +262,19 @@ class References extends Component {
 
         },
         {
+            
             Header: 'Notified?',
             headerClassName: "table-header-grid",
             accessor: 'notified',
-            show: false
+            Cell: ({ value }) => {
+                if(value){
+                    return "Yes";
+                }
+                else{
+                    return "No";
+                }
+            },
+            show: true
         },
         {
             Header: 'Action',

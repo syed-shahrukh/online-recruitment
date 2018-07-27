@@ -24,9 +24,6 @@ class Profile extends Component {
             userId: "5b56ca115a43e31ba0be9cd1"
         };
     }
-<<<<<<< HEAD
-
-=======
     childInformation(information){
         const generalInformation = information;
         axios.post('api/CandidateProfile/' , generalInformation)
@@ -34,7 +31,6 @@ class Profile extends Component {
                 console.log(response);
             })
     }
->>>>>>> 28f0add0cfdfe3e44b0e36dfd454718f52582677
     componentDidMount(){
         console.log("This user_id is: ");
     }

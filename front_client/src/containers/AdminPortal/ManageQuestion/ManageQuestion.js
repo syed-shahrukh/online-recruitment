@@ -8,15 +8,9 @@ import ReactTable from 'react-table';
 import './ManageQuestion.css';
 import axios from 'axios';
 
-const fakeData = [
-    
-  ];
-  const add_answer_fakeData = [
-    { statement: "Data Object Model", answer: 'false' },
-    { statement: "Data Oriented Model", answer: 'false' }
-  ];
 class ManageQuestion extends Component{
   componentDidMount(){
+    
     axios.get('/api/sections/')
     .then(response => {
       const section = response.data
@@ -42,8 +36,23 @@ class ManageQuestion extends Component{
       });;
   }
     state = {
-        sectionToList: [],
-        statement: '',
+      sectionToList:[],
+        questionsToList: [],
+        answersToShow: [],
+        questionToAdd: {
+          questionText: '',
+          answer:[{statement: "This is your Boy L&P", isAnswer:false}, {statement:"This better should work!", isAnswer:true}],
+          sectionId: '',
+          imagePath: '',
+          isDeleted: false },
+
+
+        answerToAdd: {
+            statement: "",
+            isAnswer: false
+        },
+
+
         parent_show: false,
         child_show: false,
         graphic_content: false,
@@ -59,11 +68,19 @@ class ManageQuestion extends Component{
           },
           {
             Header: "Is answer?",
-            accessor: "answer",
+            accessor: "isAnswer",
             minWidth:80,
             maxWidth:100,
             headerClassName: "table-header-grid",
-            show: true
+            Cell: ({ value }) => {
+              if(value){
+                  return "Yes";
+              }
+              else{
+                  return "No";
+              }
+          },
+          show: true
           },
           {
             Header: "Action",
@@ -169,9 +186,50 @@ class ManageQuestion extends Component{
 
     fillValue = (event) => {
       const statement = event;
-      this.setState({statement: statement}, () => {console.log(this.state.statement);});
+      const questionText = this.state.questionToAdd;
+      questionText.questionText = statement;
+      this.setState({questionToAdd: questionText}, () => {console.log(this.state.questionToAdd);});
       
     }
+    selectSection = (event) => {
+      const section = event.target.value;
+      const newQuestion = this.state.questionToAdd;
+      newQuestion.sectionId = section;
+      this.setState({questionToAdd: newQuestion}, () => console.log(this.state.questionToAdd));
+    }
+    addAnswerToQuestion = (event) => {
+      let currentAnswer = this.state.answerToAdd;
+      const name = event.target.name;
+      switch(name){
+        case "answerStatement":
+        const description = event.target.value;
+        currentAnswer.statement = description;
+        this.setState({answerToAdd: currentAnswer}, () => console.log(this.state.answerToAdd));
+        break;
+        case "isAnswerCheckbox":
+          currentAnswer.isAnswer = !currentAnswer.isAnswer;
+          this.setState({answerToAdd: currentAnswer}, () => console.log(this.state.answerToAdd));
+
+        break;
+
+        default:
+      }
+      
+    }
+  submitNewAnswer = () => {
+    const answerOption = this.state.answerToAdd;
+    let question = this.state.questionToAdd;
+    question.answer = [...question.answer, answerOption];
+   
+    
+    this.setState({questionToAdd: question,
+                  answerToAdd:{statement: "", isAnswer:false}
+                },
+                () => {console.log(this.state.questionToAdd.answer)
+                       console.log(this.state.answerToAdd)});
+    
+    this.handleChildClose();
+  }
     
     render(){
         return(
@@ -217,7 +275,11 @@ class ManageQuestion extends Component{
                     </div>
                    
                     <div className="tabular-data">
-                        <ReactTable className="table-grid" showPagination={false} data={fakeData} minRows={0} columns={this.state.columns} />
+                        <ReactTable className="table-grid"
+                         showPagination={false}
+                          data={this.state.questionsToList}
+                          minRows={10}
+                          columns={this.state.columns} />
                     </div>
                 </div>
 {/******************************************Modals****************************************************************/}
@@ -284,11 +346,10 @@ class ManageQuestion extends Component{
                           {"     "}
                         </div>
     
-                        <FormControl componentClass="select" placeholder="select">
-                          {}
-                          <option value="section1">Section 1</option>
-                          <option value="section2">Section 2</option>
-                          <option value="section3">Section 3</option>
+                        <FormControl onChange={this.selectSection} componentClass="select" placeholder="select">
+                          {this.state.sectionToList.map(section => {
+                            return <option value={section._id}  key={section._id}>{section.name}</option>
+                          })}
                         </FormControl>
                       </div>
                     </div>
@@ -318,8 +379,9 @@ class ManageQuestion extends Component{
                  {/*********************** Answers Table***************************************/}
                  <div className="row ">
                  <div className="col-md-12 answer-table">
+                 
                  <ReactTable
-                  data={add_answer_fakeData}
+                  data={this.state.questionToAdd.answer}
                    className="table-grid" 
                    minRows={5} 
                    showPagination={false}
@@ -356,17 +418,17 @@ class ManageQuestion extends Component{
                                 <ControlLabel>Description</ControlLabel>{' '}
                             </div>
                             <FormControl
-                                name="answerstatement"
+                                name="answerStatement"
                                 type="text"
                                 placeholder="Please Specify"
-                                onChange = {this.fillValues}
+                                onChange = {this.addAnswerToQuestion}
                             />    
                         </div>
                        </div>
                        <div className="row">
                        <div className="col-md-6 is-answer-checkbox">
                        <FormGroup>
-                       <Checkbox inline>Is Answer?</Checkbox>
+                       <Checkbox onChange={this.addAnswerToQuestion} name="isAnswerCheckbox" inline>Is Answer?</Checkbox>
                      </FormGroup>
                        </div>
                        </div>
@@ -376,7 +438,7 @@ class ManageQuestion extends Component{
                 
                 <div className="row">
                     <div className="col-md-12 save-answer">
-                        <Button bsClass="xavor-style" onClick={this.handleChildClose}>Save</Button>
+                        <Button bsClass="xavor-style" onClick={this.submitNewAnswer}>Save</Button>
                     </div>
                 </div>
               </Modal.Body>
