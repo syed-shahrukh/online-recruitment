@@ -1,12 +1,24 @@
 const _ = require('lodash');
 const {Question, validate} = require('../models/questions');
 const {Answer} = require('../models/answers');
+const {Orders} = require('../models/orders');
+const {Products} = require('../models/products');
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const questions = await Question.find({ isDeleted: false }).sort('dateCreated');
+  const questions = await Question.aggregate([
+    { $lookup:
+       {
+         from: 'answers',
+         localField: '_id',
+         foreignField: 'questionId',
+         as: 'answerdetails'
+       }
+     },
+     { "$match": { isDeleted: false } }
+    ]).sort('dateCreated');
   res.send(questions);
 });
 
@@ -19,10 +31,10 @@ router.post('/', async (req, res) => {
   //save data in collection
   await question.save();
   
-  let ans_Obj= req.body.answer;
+  let ans_Obj= req.body.answerdetails;
   Object.keys(ans_Obj).map( async function(key) {
     let answer = new Answer({
-        ans_text: ans_Obj[key].answer,
+        ans_text: ans_Obj[key].ans_text,
         questionId: question._id,
         isCorrect: ans_Obj[key].isCorrect
     });
@@ -37,19 +49,32 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { error } = validate(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
+  
 
   const question = await Question.findByIdAndUpdate(req.params.id, 
     { 
       questionText: req.body.questionText,
+      answerdetails: req.body.answerdetails,
       sectionId: req.body.sectionId,
       dateModified: new Date()
     }, {
     new: true
   });
-
+  
   /// need to update ans as well, if admin removes or updates any ans.
   ///left it for future implementation
+  await Answer.find({questionId: req.params.id}).remove().exec(); //Removes Existing Answers for given Question
+  let ans_Obj= req.body.answerdetails;
+  Object.keys(ans_Obj).map( async function(key) {
+    let answer = new Answer({
+        ans_text: ans_Obj[key].ans_text,
+        questionId: question._id,
+        isCorrect: ans_Obj[key].isCorrect
+    });
 
+    /// save answers for given question ID
+    await answer.save();
+  });
 
 
   if (!question) return res.status(404).send('The question with the given ID was not found.');

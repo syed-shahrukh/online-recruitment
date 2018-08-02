@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
+// const {Answer} = require('../models/answers');
 
 const Question = mongoose.model('Question', new mongoose.Schema({
     questionText: {
@@ -8,9 +9,11 @@ const Question = mongoose.model('Question', new mongoose.Schema({
       minlength: 1,
       maxlength: 1000
     },
-    answer: {
-        type:Array,
-        required: true
+    answerdetails: {
+       type:Array,
+    //    type: mongoose.Schema.Types.ObjectId,
+    //    ref: 'Answer', 
+       required: true
     },
     dateCreated: {
         type: Date,
@@ -37,8 +40,8 @@ function validateQuestion(question) {
     const schema = {
         questionText: Joi.string().min(1).required(),
         sectionId: Joi.string().required(),
-        answer: Joi.array().items(Joi.object().keys({
-            answer: Joi.string().min(1).max(1000).required(),
+        answerdetails: Joi.array().items(Joi.object().keys({
+            ans_text: Joi.string().min(1).max(1000).required(),
             isCorrect: Joi.boolean().required()
         })).min(1).required()
     };
