@@ -20,7 +20,7 @@ const CandidateReference = mongoose.model('CandidateReference', new mongoose.Sch
         maxlength: 255
     },
     phone: {
-        type: Date,
+        type: String,
         required: true,
     },
     yearsKnown: {

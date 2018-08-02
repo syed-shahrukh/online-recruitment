@@ -12,19 +12,11 @@ class ManageQuestion extends Component{
   componentDidMount(){
     axios.get('/api/sections/')
     .then(response => {
-      const section = response.data;
-      const newQuestion = {
-    
-        questionText: '',
-        answerdetails:[],
-        sectionId: ''
-        };
-      this.setState({sectionToList: section, newQuestion: newQuestion}, () => {console.log(this.state.sectionToList)});
+      const section = response.data
+      this.setState({sectionToList: section}, () => {console.log(this.state.sectionToList)});
       axios.get('/api/questions')
       .then(response => {
         console.log(response.data);
-        
-
       this.setState({questionsToList:response.data});
       })
         .catch((error) => {
@@ -53,25 +45,111 @@ class ManageQuestion extends Component{
     state = {
       sectionToList:[],
         questionsToList: [],
+        selectedQuestion: {},
         selectedAnswer: {},
-        newQuestion: {
+        answersToShow: [],
+        questionToAdd: {
           questionText: '',
-          answerdetails:[],
+          answer:[{answer: "This is your Boy L&P", isCorrect:false}, {answer:"This better should work!", isCorrect:true}],
           sectionId: '',
            },
         answerToAdd: {
-            ans_text: "",
+            answer: "",
             isCorrect: false
         },
-        questionEditStatus: false,
-        answerEditStatus: false,
-       showAddQuestionModal: false,
-       showAddAnswerModal:false,
+        parent_show: false,
+        addAddAnswerShow: false,
         graphic_content: false,
-        confirmDeleteAlert: false,
-        modifiedAnswerIndex: null,
-        deleteStatus: false,
-        
+        show_delete_alert: false,
+
+        showEditQuestionModal: false,
+        hideEditQuestionModal: false,
+        addAnswerInEditModal: false,
+        headerClassName: "table-header-grid",
+        answer_columns: [
+          {
+            Header: "Answer Text",
+            minWidth:300,
+            maxWidth:500,
+            accessor: "ans_text",
+            headerClassName: "table-header-grid",
+            show: true
+          },
+          {
+            Header: "Is answer?",
+            accessor: "isCorrect",
+            minWidth:80,
+            maxWidth:100,
+            headerClassName: "table-header-grid",
+            Cell: ({ value }) => {
+              if(value){
+                  return "Yes";
+              }
+              else{
+                  return "No";
+              }
+          },
+          show: true
+          },
+          {
+            Header: "Action",
+            minWidth:80,
+            maxWidth:100,
+            headerClassName: "table-header-grid",
+            Cell: row => (
+              <div>
+                <span>
+                <a onClick={() => this.handleAnswerEditOperation(row.original)}>Edit</a>
+                </span>
+                <span>
+                <a onClick={() => this.handleAnswerDeleteOperation(row.original)}>Delete</a>
+                </span>
+              </div>
+            )
+          }
+        ],
+        answer_columns_in_edit: [
+          {
+            Header: "Answer Text",
+            minWidth:300,
+            maxWidth:500,
+            accessor: "ans_text",
+            headerClassName: "table-header-grid",
+            show: true
+          },
+          {
+            Header: "Is answer?",
+            accessor: "isCorrect",
+            minWidth:80,
+            maxWidth:100,
+            headerClassName: "table-header-grid",
+            Cell: ({ value }) => {
+              if(value){
+                  return "Yes";
+              }
+              else{
+                  return "No";
+              }
+          },
+          show: true
+          },
+          {
+            Header: "Action",
+            minWidth:80,
+            maxWidth:100,
+            headerClassName: "table-header-grid",
+            Cell: row => (
+              <div>
+                <span>
+                <a onClick={() => this.handleAnswerEditOperation(row.original)}>Edit</a>
+                </span>
+                <span>
+                <a onClick={() => this.handleAnswerDeleteOperation(row.original)}>Delete</a>
+                </span>
+              </div>
+            )
+          }
+        ],
         columns: [
           {
             Header: "Question Statement",
@@ -119,7 +197,7 @@ class ManageQuestion extends Component{
             Cell: row => (
               <div>
               <span>
-                <a onClick={ () => this.handleQuestionEditOperation(row.original) }>Edit</a>
+                <a onClick={ () => this.showEditQuestionModal(row.original) }>Edit</a>
               </span>
 
             <span>
@@ -129,82 +207,38 @@ class ManageQuestion extends Component{
               </div>
             )
           }
-        ],
-        answer_columns: [
-          {
-            Header: "Answer Text",
-            minWidth:300,
-            maxWidth:500,
-            accessor: "ans_text",
-            headerClassName: "table-header-grid",
-            show: true
-          },
-          {
-            Header: "Is answer?",
-            accessor: "isCorrect",
-            minWidth:80,
-            maxWidth:100,
-            headerClassName: "table-header-grid",
-            Cell: ({ value }) => {
-              if(value){
-                  return "Yes";
-              }
-              else{
-                  return "No";
-              }
-          },
-          show: true
-          },
-          {
-            Header: "Action",
-            minWidth:80,
-            maxWidth:100,
-            headerClassName: "table-header-grid",
-            Cell: row => (
-              <div>
-                <span>
-                <a onClick={() => this.handleEditAnswer(row.original)}>Edit</a>
-                </span>
-                <span>
-                <a onClick={() => this.handleDeleteAnswer(row.original)}>Delete</a>
-                </span>
-              </div>
-            )
-          }
-        ],
-        
-        
+        ]
       };
     
     
       /***************************** Functions****************************************************** */
-    handleAddQuestionModal = () => {
-      const status = !this.state.showAddQuestionModal;
-      this.setState({showAddQuestionModal: status} );
+    handleClose = () => {
+        this.setState({ parent_show: false });
     }
-    handleAddAnswerModal = () => {
-        const status = !this.state.showAddAnswerModal;
-        
-        this.setState({ showAddAnswerModal: status });
+    
+    handleShow = () => {
+        this.setState({ parent_show: true });
     }
-   
+    handleChildShow = () => {
+        this.setState({ addAddAnswerShow: true });
+    }
+    handleChildClose = () => {
+        this.setState({ addAddAnswerShow: false });
+    }
     handleDeleteAlert = (row) => {
-      const deleteStatus = !this.state.confirmDeleteAlert;
-      this.setState({newQuestion: row, confirmDeleteAlert: deleteStatus}, () => console.log(this.state.newQuestion));
+      const deleteStatus = !this.state.show_delete_alert;
+      this.setState({selectedQuestion: row, show_delete_alert: deleteStatus}, () => console.log(this.state.selectedQuestion));
     }
     handleDeleteOperation = () => {
-      const selectedQuestion = this.state.newQuestion;
+      const selectedQuestion = this.state.selectedQuestion;
       const id = selectedQuestion._id;
-      this.setState({deleteStatus: true});
       axios.delete(`/api/questions/${id}`)
       .then(response => {
           
           
           axios.get('/api/questions/')
           .then( response => {
-            
-            
-              this.setState({questionsToList: response.data, deleteStatus: false});
+              this.setState({questionsToList: response.data});
               this.handleDeleteAlert();
                });
 
@@ -229,44 +263,26 @@ class ManageQuestion extends Component{
           });;
     }
 
-    handleQuestionEditOperation = (row) =>{
-        this.setState({newQuestion: row, questionEditStatus: true}, () => {
-          console.log(this.state.newQuestion);
-          console.log("\nThe value of State Edit Flag is: ");
-          console.log(this.state.questionEditStatus);
-        });
-        this.handleAddQuestionModal();
+    handleEditOperation = (row) =>{
+        this.setState({selectedQuestion: row})
+        this.handleEditShow();
     }
-    endEditQuestion = () => {
-      const newQuestion = {
-    
-                  questionText: '',
-                  answerdetails:[],
-                  sectionId: ''
-                  }
 
-      this.setState({newQuestion: newQuestion, questionEditStatus: false}, () => {
-        console.log(this.state.newQuestion);
-        console.log(this.state.questionEditStatus);
-        this.handleAddQuestionModal();
-        
-      })
+
+    editQuestionAnswer = () => {
+      let selectedAnswer = this.state.selectedAnswer;
+      const isAnswer = !this.state.selectedAnswer.isCorrect;
+      selectedAnswer.isCorrect = isAnswer;
+      this.setState({selectedAnswer: selectedAnswer}, () => {console.log(this.state.selectedAnswer)});
     }
     saveQuestion = () => {
-      const questionToAdd = this.state.newQuestion;
+      const questionToAdd = this.state.questionToAdd;
       console.log(questionToAdd);
       axios.post('/api/questions', questionToAdd)
       .then(response =>{
         axios.get('/api/questions')
-        .then (response => {
-          const questionTemplate = {
-            questionText: '',
-            answerdetails:[],
-            sectionId: '',
-             }
-          this.setState({questionsToList: response.data, newQuestion: questionTemplate});
-                            this.handleAddQuestionModal();
-                            });
+        .then (response => {this.setState({questionsToList: response.data});
+                            this.handleClose();});
       })
       .catch((error) => {
         // Error
@@ -287,48 +303,6 @@ class ManageQuestion extends Component{
         }
         });;
     }
-    handleEditAnswer = (row) => {
-      if(!this.state.questionEditStatus){
-        const selectedAnswer = row; //Copy the answer to be edited in local variable
-        let activeQuestion = this.state.newQuestion;
-        const indexToDelete = activeQuestion.answerdetails.findIndex(function(element){
-          return element === selectedAnswer;
-        });
-        // activeQuestion.answerdetails.splice(indexToDelete, 1);
-      this.setState({selectedAnswer: selectedAnswer, answerEditStatus: true, modifiedAnswerIndex: indexToDelete}, () => {
-        console.log(this.state.selectedAnswer);
-        console.log("The index of selected answer is:  ");
-        console.log(indexToDelete);
-        console.log(this.state.answerEditStatus);
-        this.handleAddAnswerModal();
-      });
-      }
-      else{
-
-      }
-      return;
-    }
-    editSelectedAnswer = (event) => {
-      const selectedAnswer = this.state.selectedAnswer;
-      const name = event.target.name;
-      switch(name){
-        case "answerStatement":
-        const description = event.target.value;
-        selectedAnswer.ans_text = description;
-        this.setState({answerToAdd: selectedAnswer}, () => console.log(this.state.answerToAdd));
-        break;
-        case "isAnswerCheckbox":
-          selectedAnswer.isCorrect = !selectedAnswer.isCorrect;
-          this.setState({answerToAdd: selectedAnswer}, () => console.log(this.state.answerToAdd));
-
-        break;
-
-        default:
-      }
-    }
-    handleDeleteAnswer = (row) => {
-      console.log(row);
-    }
     /***************************** End of Functions****************************************************** */
     /*********************Conditional rendering of Uploading Graphic Content*********************************/
     showGraphicalContent = (event) => {
@@ -340,29 +314,42 @@ class ManageQuestion extends Component{
           this.setState({graphic_content: false});
         }
     }
-    
+    summerNote = (content) => {
+      console.log(content);
+    }
+
     fillValue = (event) => {
       const statement = event;
-      const questionText = this.state.newQuestion;
+      const questionText = this.state.questionToAdd;
       questionText.questionText = statement;
-      this.setState({newQuestion: questionText}, () => {console.log(this.state.newQuestion);});
+      this.setState({questionToAdd: questionText}, () => {console.log(this.state.questionToAdd);});
       
     }
-    
+    editQuestion = (event) => {
+      const statement = event;
+      const questionText = this.state.selectedQuestion;
+      questionText.questionText = statement;
+      this.setState({selectedQuestion: questionText}, () => console.log(this.state.selectedQuestion));
+    }
     selectSection = (event) => {
       const section = event.target.value;
-      const newQuestion = this.state.newQuestion;
+      const newQuestion = this.state.questionToAdd;
       newQuestion.sectionId = section;
-      this.setState({questionToAdd: newQuestion}, () => console.log(this.state.newQuestion));
+      this.setState({questionToAdd: newQuestion}, () => console.log(this.state.questionToAdd));
     }
-   
+    editSelectSection = (event) => {
+      const section = event.target.value;
+      const updateQuestion = this.state.selectedQuestion;
+      updateQuestion.sectionId = section;
+      this.setState({selectedQuestion: updateQuestion}, () => console.log(this.state.selectedQuestion));
+    }
     addAnswerToQuestion = (event) => {
       let currentAnswer = this.state.answerToAdd;
       const name = event.target.name;
       switch(name){
         case "answerStatement":
         const description = event.target.value;
-        currentAnswer.ans_text = description;
+        currentAnswer.answer = description;
         this.setState({answerToAdd: currentAnswer}, () => console.log(this.state.answerToAdd));
         break;
         case "isAnswerCheckbox":
@@ -375,54 +362,44 @@ class ManageQuestion extends Component{
       }
       
     }
-  
   submitNewAnswer = () => {
     const answerOption = this.state.answerToAdd;
-    let question = this.state.newQuestion;
-    question.answerdetails = [...question.answerdetails, answerOption];
+    let question = this.state.questionToAdd;
+    question.answer = [...question.answer, answerOption];
    
     
     this.setState({questionToAdd: question,
-                  answerToAdd:{ans_text: "", isCorrect:false}
+                  answerToAdd:{answer: "", isCorrect:false}
                 },
-                () => {console.log(this.state.newQuestion.answerdetails)
+                () => {console.log(this.state.questionToAdd.answer)
                        console.log(this.state.answerToAdd)});
     
-    this.handleAddAnswerModal();
+    this.handleChildClose();
   }
-submitModifiedAnswer = () => {
-  const answerOption = this.state.selectedAnswer;
-    let question = this.state.newQuestion;
-    question.answerdetails.splice(this.state.modifiedAnswerIndex,1);
-    question.answerdetails = [...question.answerdetails, answerOption];
-   
-    
-    this.setState({newQuestion: question,
-                  selectedAnswer:{ans_text: "", isCorrect:false}, modifiedAnswerIndex: null
-                },
-                () => {console.log(this.state.newQuestion.answerdetails)
-                       console.log(this.state.selectedAnswer)});
-    
-    this.handleAddAnswerModal();
-}
-  
+
+  showEditQuestionModal = (row) => {
+    //Show the Edit Question modal and set state object Selected Question
+    this.setState({showEditQuestionModal: true, selectedQuestion: row});
+  }
+  hideEditQuestionModal = () => {
+    this.setState({showEditQuestionModal: false});
+  }
+  handleAnswerModalInEdit = () => {
+    const status = !this.state.addAnswerInEditModal;
+    this.setState({addAnswerInEditModal: status});
+  }
   modifyQuestion = () => {
-    const id = this.state.newQuestion._id;
-    const modifiedQuestion = this.state.newQuestion;
+    const id = this.state.selectedQuestion._id;
+    const modifiedQuestion = this.state.selectedQuestion;
     
     const updatedQuestion = {
       questionText: modifiedQuestion.questionText,
-      answerdetails: modifiedQuestion.answerdetails.map(answer => {
-                        return {ans_text: answer.ans_text,
-                                isCorrect: answer.isCorrect}
-                      }),
+      answer: modifiedQuestion.answer,
       sectionId: modifiedQuestion.sectionId
     }
-    console.log(updatedQuestion);
     axios.put(`/api/questions/${id}`, updatedQuestion)
     .then( response => {
-      this.setState({questionEditStatus: false});
-      this.handleAddQuestionModal();
+      this.hideEditQuestionModal();
       axios.get('/api/questions/')
       .then(response => this.setState({questionsToList: response.data}));
     })
@@ -447,21 +424,20 @@ submitModifiedAnswer = () => {
   }
   addAnswerinEdit = () => {
     const answerOption = this.state.answerToAdd;
-    let question = this.state.newQuestion;
+    let question = this.state.selectedQuestion;
     question.answer = [...question.answer, answerOption];
    
     
     this.setState({selectedQuestion: question,
                   answerToAdd:{answer: "", isCorrect:false}
                 },
-                () => {console.log(this.state.newQuestion.answerdetails)
+                () => {console.log(this.state.questionToAdd.answer)
                        console.log(this.state.answerToAdd)});
     
     this.handleAnswerModalInEdit();
   
   }
     render(){
-      const editStatus = this.state.questionEditStatus;
         return(
             <Aux>
                 
@@ -499,7 +475,7 @@ submitModifiedAnswer = () => {
                     </div>
                     <div className="add-button">
                             <span className="glyphicon glyphicon-plus"></span>
-                            <a onClick={this.handleAddQuestionModal}>  Add a new question</a>
+                            <a onClick={this.handleShow}>  Add a new question</a>
                     </div>
                      
                     </div>
@@ -519,9 +495,9 @@ submitModifiedAnswer = () => {
 {/******************************************Modals****************************************************************/}
 {/**********************************Add Question Modal************************************************************/}            
 
-<Modal show={this.state.showAddQuestionModal} onHide={this.endEditQuestion} >
+<Modal show={this.state.parent_show} onHide={this.handleClose} >
           <Modal.Header closeButton>
-            <Modal.Title>{this.state.questionEditStatus ? "Edit Question" : "Add Question"}</Modal.Title>
+            <Modal.Title>Add Question</Modal.Title>
           </Modal.Header>
           <Modal.Body>
           {/*********************** Content Body***************************************/}
@@ -537,7 +513,7 @@ submitModifiedAnswer = () => {
                         </div>
                         
                         <ReactSummernote
-                        value={this.state.deleteStatus ? "" : this.state.newQuestion.questionText}
+                        value={this.state.statement}
                         options={{
                           height: 50,
                           dialogsInBody: true,
@@ -583,8 +559,7 @@ submitModifiedAnswer = () => {
                         <FormControl onChange={this.selectSection} componentClass="select" placeholder="select">
                           <option value={""}>Select</option>
                           {this.state.sectionToList.map(section => {
-                            return <option selected={editStatus ? section._id === this.state.newQuestion.sectionId ?
-                            true : false : false } value={section._id}  key={section._id}>{section.name}</option>
+                            return <option value={section._id}  key={section._id}>{section.name}</option>
                           })}
                         </FormControl>
                       </div>
@@ -609,7 +584,7 @@ submitModifiedAnswer = () => {
                     Add answer options for above question.
                   </div>
                  <div className="col-md-6 add-answer">
-                  <Button onClick={this.handleAddAnswerModal} bsClass="xavor-style">Add Answer</Button>
+                  <Button onClick={this.handleChildShow} bsClass="xavor-style">Add Answer</Button>
                 </div>
                 </div>
                  {/*********************** Answers Table***************************************/}
@@ -617,7 +592,7 @@ submitModifiedAnswer = () => {
                  <div className="col-md-12 answer-table">
                  
                  <ReactTable
-                  data={this.state.newQuestion.answerdetails}
+                  data={this.state.questionToAdd.answer}
                    className="table-grid" 
                    minRows={5} 
                    showPagination={false}
@@ -628,10 +603,7 @@ submitModifiedAnswer = () => {
              {/*********************** Save Button***************************************/}
              <div className="row">
               <div className="col-md-12 save-answer">
-              {editStatus ?
-                <Button bsClass="xavor-style" onClick={this.modifyQuestion}>Modify</Button> :
                 <Button bsClass="xavor-style" onClick={this.saveQuestion}>Save</Button>
-              }
               </div>
              </div>
               
@@ -643,10 +615,143 @@ submitModifiedAnswer = () => {
         {/*****************************End of Add Question Modal*************************************************/}
 
 
+    
+    
+    {/**********************************Edit Question Modal************************************************************/}            
+
+<Modal show={this.state.showEditQuestionModal} onHide={this.hideEditQuestionModal} >
+          <Modal.Header closeButton>
+            <Modal.Title>Add Question</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          {/*********************** Content Body***************************************/}
+            <div className="content-body">
+              
+                <Form className="add-question">
+                  <FormGroup controlId="formBasicText">
+                  {/*********************** Question Statement***************************************/}
+                    <div className="row fields">
+                      <div className="col-md-12">
+                        <div>
+                          <ControlLabel>Statement</ControlLabel>{" "}
+                        </div>
+                        
+                        <ReactSummernote
+                        value={this.state.selectedQuestion.questionText}
+                        options={{
+                          height: 50,
+                          dialogsInBody: true,
+                          toolbar: [
+                            ['style', ['style']],
+                            ['font', ['bold', 'underline', 'clear']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['view', [ 'codeview']]
+                          ],
+                          codemirror: {
+                            theme: 'monokai'
+                          }
+                        
+                        }}
+                        onChange={this.editQuestion}
+                      />
+                      
+                      </div>
+                      
+                    </div>
+    {/*********************** Which Section it belongs to***************************************/}
+                  
+    {/*********************** Whether question has some visual aid or not***************************************/}
+                    <div className="row fields">
+                    <div className="col-md-6">
+                        <div>
+                          <ControlLabel>Question Type</ControlLabel>
+                          {"     "}
+                        </div>
+    
+                        <FormControl onChange={this.showGraphicalContent} componentClass="select" placeholder="select">
+                          <option value="textual">Textual</option>
+                          <option value="graphical">Graphical</option>
+                        </FormControl>
+                      </div>
+                      <div className="col-md-6">
+                      
+                        <div>
+                          <ControlLabel>Section</ControlLabel>
+                          {"     "}
+                        </div>
+    
+                        <FormControl onChange={this.editSelectSection} componentClass="select" placeholder="select">
+                          <option value={""}>Select</option>
+                          {this.state.sectionToList.map(section => {
+                            return <option value={section._id}  key={section._id}>{section.name}</option>
+                          })}
+                        </FormControl>
+                      </div>
+                    </div>
+    
+                    {/*********************** Conditional Rendering of File upload*************************/}
+                   { this.state.graphic_content ? <div className="row fields">
+                    <div className="col-md-6">
+                        <div>
+                          <ControlLabel>Graphical Content</ControlLabel>
+                          {"     "}
+                        </div>
+    
+                        <input type="file" name="file" hidden/>
+                      </div>
+                      </div>: console.log("") }
+                  </FormGroup>
+                </Form>
+                {/*********************** Add Answer Button***************************************/}
+                <div className="row">
+                  <div className="col-md-6">
+                    Add answer options for above question.
+                  </div>
+                 <div className="col-md-6 add-answer">
+                  <Button onClick={this.handleAnswerModalInEdit} bsClass="xavor-style">Add Answer</Button>
+                </div>
+                </div>
+                 {/*********************** Answers Table***************************************/}
+                 <div className="row ">
+                 <div className="col-md-12 answer-table">
+                 
+                 <ReactTable
+                  data={this.state.selectedQuestion.answerdetails}
+                   className="table-grid" 
+                   minRows={5} 
+                   showPagination={false}
+                    columns={this.state.answer_columns_in_edit} />
+                 </div>
+               
+             </div>
+             {/*********************** Save Button***************************************/}
+             <div className="row">
+              <div className="col-md-12 save-answer">
+                <Button bsClass="xavor-style" onClick={this.modifyQuestion}>Modify</Button>
+              </div>
+             </div>
+              
+            </div>
+            </Modal.Body>
+            </Modal>
+
+
+        {/*****************************End of Edit Question Modal*************************************************/}
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
         {/****************************Add Add Answer Modal***********************************************************/}
-            <Modal show={this.state.showAddAnswerModal} onHide={this.handleAddAnswerModal} >
+            <Modal show={this.state.addAddAnswerShow} onHide={this.handleChildClose} >
               <Modal.Header closeButton>
-                <Modal.Title>{this.state.answerEditStatus ? "Edit Answer" : "Add Answer"}</Modal.Title>
+                <Modal.Title>Add Answer</Modal.Title>
               </Modal.Header>
               <Modal.Body>
             
@@ -661,11 +766,8 @@ submitModifiedAnswer = () => {
                             <FormControl
                                 name="answerStatement"
                                 type="text"
-                                value= {this.state.answerEditStatus ? this.state.selectedAnswer.ans_text : 
-                                        this.state.answerToAdd.ans_text}
                                 placeholder="Please Specify"
-                                onChange = {this.state.answerEditStatus ? this.editSelectedAnswer
-                                             :  this.addAnswerToQuestion}
+                                onChange = {this.addAnswerToQuestion}
                             />    
                         </div>
                        </div>
@@ -682,21 +784,59 @@ submitModifiedAnswer = () => {
                 
                 <div className="row">
                     <div className="col-md-12 save-answer">
-                    
-                    
-                      <Button bsClass="xavor-style" onClick={this.state.answerEditStatus ? this.submitModifiedAnswer: 
-                                                              this.submitNewAnswer}>Save</Button>
-                    
-                        
+                        <Button bsClass="xavor-style" onClick={this.submitNewAnswer}>Save</Button>
                     </div>
                 </div>
               </Modal.Body>
             </Modal>
         {/*********************************End of Add Answer Modal*****************************************/}
+{/****************************Add Answer in edit Question Modal***********************************************************/}
+            <Modal show={this.state.addAnswerInEditModal} onHide={this.handleChildClose} >
+              <Modal.Header closeButton>
+                <Modal.Title>Add Answer</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+            
+                <Form className="academic-info">
+                <FormGroup controlId="formBasicText">
+                
+                    <div className="row">
+                        <div className="col-md-8">
+                            <div>
+                                <ControlLabel>Description</ControlLabel>{' '}
+                            </div>
+                            <FormControl
+                                name="answerStatement"
+                                type="text"
+                                placeholder="Please Specify"
+                                onChange = {this.addAnswerToQuestion}
+                            />    
+                        </div>
+                       </div>
+                       <div className="row">
+                       <div className="col-md-6 is-answer-checkbox">
+                       <FormGroup>
+                       <Checkbox onChange={this.addAnswerToQuestion} name="isAnswerCheckbox" inline>Is Answer?</Checkbox>
+                     </FormGroup>
+                       </div>
+                       </div>
+                </FormGroup>
+                
+            </Form>
+                
+                <div className="row">
+                    <div className="col-md-12 save-answer">
+                        <Button bsClass="xavor-style" onClick={this.addAnswerinEdit}>Save</Button>
+                    </div>
+                </div>
+              </Modal.Body>
+            </Modal>
+        {/*********************************End of Add Answer in Edit Modal*****************************************/}
+
 
 
         {/**********************************************Confirm Delete Modal**************************************************/}
-      <Modal show={this.state.confirmDeleteAlert} onHide={this.handleDeleteAlert}>
+      <Modal show={this.state.show_delete_alert} onHide={this.closeAnswerModalInEdit}>
                                 <Modal.Header closeButton>
                                     <Modal.Title><b>Confirm Delete?</b></Modal.Title>
                                 </Modal.Header>

@@ -15,7 +15,7 @@ import { Redirect } from 'react-router-dom';
 
 class Login extends Component {
   state ={
-    email_regex: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    email_regex: /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/,
     
     signup_status: false,
     signup_email: "",
@@ -57,11 +57,10 @@ class Login extends Component {
         .then(response => {
             const user_id = response.data._id;
             console.log("User Created successfully: " + response.data + "\nAnd the Id of user is: " + user_id);
-            this.setState({signup_status: true, active_user: user_id});
-            if(this.state.signup_status){
-              const path = `/profile/$:{user_id}`;
-              <Redirect to={{ pathname: {path}, state: { userId: this.state.active_user }}} />
-            }
+            this.setState({signup_status: true, active_user: user_id}, () => {
+              <Redirect to={{ pathname: `/profile/${user_id}`, state: { userId: this.state.active_user }}} /> /* jshint expr: true */
+            });
+            
             
         }).catch((error) => {
           // Error
