@@ -1,3 +1,61 @@
+//Timer.js
+
+import React, { Component } from 'react';
+import Aux from '../../../Auxilary/Auxilary';
+
+
+class Timer extends Component{
+
+    startTimer() {
+        const self = this;
+        let timer = setInterval(function() {
+            if(self.state.masterTimerStatus === false){
+                clearInterval(timer);
+            }
+            if(self.state.masterTimer === -1){
+                clearInterval(timer);
+            }
+            self.setState(({ masterTimer }) => ({
+                masterTimer: masterTimer - 1,
+
+            }));
+
+
+          }, 1000)
+    }
+
+    componentDidMount(){
+        this.startTimer();
+    }
+
+
+    state = {
+        masterTimer: 60,
+        masterTimerStatus: this.props.isTicking
+    };
+
+
+    render(){
+        let masterTimer = this.state.masterTimer;
+        let masterTimerStatus = this.state.masterTimerStatus;
+        return(
+            <Aux>
+
+                <div className="test-timer">
+                {(this.props.isTicking) ? <p>pause timer is true</p>  : <p>pause timer is false</p>}
+                        {(masterTimer>-1 && masterTimerStatus)? <h3>{Math.floor(masterTimer/60)}:{("0" + masterTimer%60).slice(-2)}</h3>:<h3>0:00</h3>}
+                    </div>
+            </Aux>
+        );
+    }
+}
+
+export default Timer;
+
+/*******************************************************************************/*
+
+
+/**************************************Sections.js************************************************/
 import React, { Component } from 'react';
 import Aux from '../../../Auxilary/Auxilary';
 import Questions from '../Questions/Questions';
@@ -28,19 +86,23 @@ class Section extends Component{
         let timer = setInterval(function() {
             self.setState(({ section1_timer }) => ({
                 section1_timer: section1_timer - 1,
-                
+
             }));
             console.log("Value of state time: " + self.state.section1_timer );
             if(self.state.section1_timer === -1){
-                
+
                 self.setState({section1isActive:false, break_message:true, master_timer:false});
-                
+
             }
             if(self.state.section1_timer === -7){
-                self.setState({section2isActive:true, break_message:false, master_timer:true});
-                clearInterval(timer);
+                self.setState({section2isActive:true, break_message:false, master_timer:true},
+                () => {
+                    console.log("The Value of Master Timer is " + self.state.master_timer + " Now");
+                    clearInterval(timer);
                 self.startSection2Timer();
-            }           
+                });
+
+            }
           }, 1000)
     };
 
@@ -49,19 +111,19 @@ class Section extends Component{
         let timer = setInterval(function() {
             self.setState(({ section2_timer }) => ({
                 section2_timer: section2_timer - 1,
-                
+
             }));
             console.log("Value of state time: " + self.state.section2_timer );
             if(self.state.section2_timer === -1){
                 self.setState({section2isActive:false, break_message:true,master_timer: false});
-                
-                
+
+
             }
             if(self.state.section2_timer === -7){
                 self.setState({section3isActive:true, break_message:false,master_timer:true});
                 clearInterval(timer);
                 self.startSection3Timer();
-            }              
+            }
           }, 1000)
     };
 
@@ -70,29 +132,30 @@ class Section extends Component{
         let timer = setInterval(function() {
             self.setState(({ section3_timer }) => ({
                 section3_timer: section3_timer - 1,
-                
+
             }));
             console.log("Value of state time: " + self.state.section3_timer );
             if(self.state.section3_timer === -1){
                 self.setState({section3isActive:false,master_timer: false});
                 clearInterval(timer);
-                
+
             }
-                          
+
           }, 1000)
     };
     componentDidMount(){
         this.startSection1Timer();
-        
+
     }
     componentDidUpdate(){
         console.log("master_timer: " + this.state.master_timer);
     }
-   
+
     render(){
+       let masterTimer = this.state.master_timer;
         return(
             <Aux>
-                {this.state.break_message ? 
+                {this.state.break_message ?
                 <Alert bsStyle="info">
                     Your time for <strong>this section</strong> is over. Take a break. Your test will resume shortly
               </Alert>: (this.state.section1isActive) ? <h3>Section 1</h3>:
@@ -102,8 +165,8 @@ class Section extends Component{
                 }
                  <div className="question-timer">
                     <Questions/>
-                    <Timer isTicking={this.state.master_timer}/>
-                    
+                    <Timer isTicking={masterTimer}/>
+
                 </div>
                 <div className="test-window">
                     <div className="statement-and-timer">
@@ -111,7 +174,7 @@ class Section extends Component{
                         <h2><label>Test Question Statement</label></h2>
                     </div>
                     <div className="section-timer">
-                        
+
                         {(this.state.section1isActive) ?
                              (<h3>{Math.floor(this.state.section1_timer/60)}:{("0"+this.state.section1_timer%60).slice(-2)}</h3>)
                              :(this.state.section2isActive)?
@@ -122,7 +185,7 @@ class Section extends Component{
                     </div>
                     </div>
                     <div className="question-options">
-                    
+
                     <FormGroup>
                         <Radio name="radioGroup">
                             Option 1
@@ -141,10 +204,11 @@ class Section extends Component{
                     </div>
         {/*********************************End of Next Question Button************************************************/}
                 </div>
-                
+
             </Aux>
         );
     }
 }
 
 export default Section;
+/*************************************************End of Sections**************************************************************************/

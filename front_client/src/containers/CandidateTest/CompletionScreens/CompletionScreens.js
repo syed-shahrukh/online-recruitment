@@ -10,7 +10,7 @@ class CompletionScreens extends Component{
         return(
             <Aux>
                 <h1>Welcome From Completion Screen.</h1>
-                <h1>{}</h1>
+              
 
             </Aux>
         );

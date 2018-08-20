@@ -24,8 +24,10 @@ const Question = mongoose.model('Question', new mongoose.Schema({
         type: Date
     },
     sectionId: {
-      type: String,
-      required: true
+        type: String,
+//      type: mongoose.Schema.Types.ObjectId,
+        // ref: 'Section',
+        required: true
     },
     imagePath: {
         type: String

@@ -6,6 +6,7 @@ const candidateAcademicInfo = require('./routes/candidateAcademic');
 const candidateProfessionalInfo = require('./routes/candidateProfessional');
 const candidateReferenceInfo = require('./routes/candidateReference');
 const users = require('./routes/users');
+const test = require('./routes/tests');
 const express = require('express');
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/api/academicinfo', candidateAcademicInfo);
 app.use('/api/professionalinfo', candidateProfessionalInfo);
 app.use('/api/referenceinfo', candidateReferenceInfo);
 app.use('/api/users', users);
+app.use('/api/test', test);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));

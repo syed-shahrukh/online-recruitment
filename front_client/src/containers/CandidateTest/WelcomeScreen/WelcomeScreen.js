@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import Aux from '../../Auxilary/Auxilary';
-import { Link } from 'react-router-dom';
 import './WelcomeScreen.css';
 import { Button } from 'react-bootstrap';
 
 
 class WelcomeScreen extends Component{
+    constructor( props ){
+        super( props );
+      }
     state={
         show:false,
         candidate_name:'Syed Muhammad Shahrukh'
@@ -19,7 +21,14 @@ class WelcomeScreen extends Component{
         .bind(this),
         2000
     );
-  }
+  };
+  startTest = () => {
+    const self = this;
+    self.props.history.push({
+        pathname:'/candidate-test/test-screen',
+        state:{masterTimer: 3*60, currentSection:"section-1",sectionTimer:60}
+    });
+}
     render(){
         return(
             <Aux>
@@ -40,7 +49,7 @@ class WelcomeScreen extends Component{
                            <li>Your test duration will be of 60 minutes.</li>
                        </ul>
                    <div className="button-container">
-                   <Link to="/candidate-test/test-screen"> <Button bsClass="xavor-style-small">Start test</Button></Link>
+                   <Button onClick={this.startTest} bsClass="xavor-style-small">Start test</Button>
                       <Button bsClass="xavor-style-small">Complete Profile</Button>
                    </div>  
                      </div>
