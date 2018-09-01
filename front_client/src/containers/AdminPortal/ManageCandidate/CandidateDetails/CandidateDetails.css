@@ -11,3 +11,8 @@
 .hyperlink-active a {
     color: #f4c12b;
 }
+.test-window-details{
+    margin-bottom:1%;
+    border: 1px dashed black;
+    
+}

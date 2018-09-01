@@ -4,7 +4,7 @@
     overflow: hidden;
     margin-left:5%;
     margin-right:5%;
-    margin-top:1%;
+   
     border: 2px solid black;
     
     
@@ -19,13 +19,12 @@
     width: 50%;
     float: left;
     text-align: left;
-    overflow: hidden;
+    overflow: auto;
     padding-left: 15px;
 }
 .question-options{
     width:90%;
     display:inherit;
-    margin-top: 50px;
     padding-left: 18px;
     text-align: left;
 
@@ -34,8 +33,7 @@
     width: 90%;
     margin-left:5%;
     margin-right:5%;
-    margin-bottom: 1%;
-    margin-top:1%;
+  
 }
 .question-number{
     float:left;
@@ -43,9 +41,11 @@
     width:40%;
 }
 .test-timer{
-    float:right;
+    float: right;
     text-align: right;
-    width:40%;
+    width: 13%;
+    margin-bottom: 1%;
+    margin-top: 1%;
 }
 .section-timer{
     float:right;

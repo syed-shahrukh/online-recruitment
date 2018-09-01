@@ -20,8 +20,8 @@ class Profile extends Component {
 
         this.state = {
             key: 1,
-            location : this.props.location.state && this.props.location.state.userId,
-            userId: "5b56ca115a43e31ba0be9cd1"
+            
+            userId: this.props.location.state.userId
         };
     }
     childInformation(information){
@@ -32,7 +32,7 @@ class Profile extends Component {
             })
     }
     componentDidMount(){
-        console.log("This user_id is: ");
+        console.log("This user_id is: " + this.state.userId);
     }
 
     handleSelect(key) {

@@ -1,12 +1,68 @@
 const {CandidateProfile, validate} = require('../models/candidateProfileModel');
 const mongoose = require('mongoose');
+const objectId = require('mongoose').Types.ObjectId;
+const users = require('../models/userModel');
 const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const candidates = await CandidateProfile.find();
+  //const candidates = await CandidateProfile.find();
+  let candidates = await CandidateProfile.aggregate([{
+    $lookup:{
+      from: 'users',
+         localField: 'userId',
+         foreignField: '_id',
+         as: 'email'
+    }
+    
+  },
+  {
+    "$unwind": "$email"
+  },
+  {
+    "$project": {
+      "_id": 1,
+      "email.email": 1,
+      "userId": 1,
+      "fullName": 1,
+      "mobilePhone": 1,
+      "positionApplied": 1,
+      "gender": 1
+    }
+  }
+]);
+
   res.send(candidates);
 });
+
+router.get('/:id', async (req, res) => {
+  const id = new objectId(req.params.id);
+  const candidates = await CandidateProfile.aggregate(
+    [
+      {
+        $match:{ userId: id}
+      },
+      // {
+      //   "$project": {
+      //     "_id": 1,
+      //     "fullName": 1,
+      //     "fatherHusbandName": 1,
+      //     "cnic": 1,
+      //     "userId": 1,
+          
+      //     "mobilePhone": 1,
+      //     "positionApplied": 1,
+      //     "gender": 1
+      //   }
+      // }
+    ]
+  );
+  
+  res.send(candidates);
+  
+});
+
+
 
 router.post('/', async (req, res) => {
   const { error } = validate(req.body); 

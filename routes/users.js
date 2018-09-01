@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const {User, validate} = require('../models/userModel');
+const { Token } = require('../models/token');
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
@@ -17,10 +18,11 @@ router.post('/signup', async (req, res) => {
   let user = await User.findOne({email: req.body.email});
   if(user) return res.status(400).send('User already registered');
 
-  user = new User(_.pick(req.body, ['email', 'password']));
+  user = new User(_.pick(req.body, ['name','email', 'password']));
   user.password = await bcrypt.hash(user.password, 10);
   //save data in collection
   await user.save();
+  //let token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
 
   res.send(user);
 });

@@ -60,7 +60,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const academicInfo = await CandidateAcademic.findById(req.params.id);
+  const academicInfo = await CandidateAcademic.find({userId:req.params.id});
 
   if (!academicInfo) return res.status(404).send('The candidate academic information with the given ID was not found.');
 

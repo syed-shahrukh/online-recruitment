@@ -45,7 +45,8 @@ function validateQuestion(question) {
         answerdetails: Joi.array().items(Joi.object().keys({
             ans_text: Joi.string().min(1).max(1000).required(),
             isCorrect: Joi.boolean().required()
-        })).min(1).required()
+        })).min(1).required(),
+        imagePath: Joi.any()
     };
 
     return Joi.validate(question, schema);

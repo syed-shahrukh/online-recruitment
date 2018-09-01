@@ -7,45 +7,35 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  let data = [] // Empty array initialization to store the final Test Array
+router.post('/', async (req, res) => {
+
+  let questions = new Promise((resolve, reject) => {
+              let timer = req.body.testTimer;
+              let questions = Question.findOne({sectionId: {$eq: req.body.sectionId }, _id: {$nin: req.body.questionQueue}}); // Get all questions whose sectionId
+              
+               resolve(questions);                                      //matches the cuurent id of the Section in the loop
+        
+             }).then(questions => {
+
+              let answer = new Promise ((resolve, reject) => {
+              
+                let answerdetails = Answer.find({questionId: questions._id});
+              
+                resolve(answerdetails);
+              
+              }).then(answerdetails => {
+              
+                questions.answerdetails = answerdetails;
+              
+                res.send(questions);
+              
+              });
+
+                           
+              }).catch(error => {
+                res.send(error);
+              });
   
-  let sections = await Section.aggregate(
-    [{ $sample: { size: 3 } }]             // get all the sections from the sections collection
-  );
-
-  for (let i = 0; i < sections.length; i++) {   //Outer loop to loop through all the sections
-    let _section = {
-        "id": sections[i]._id,
-        "name": sections[i].name,
-        "questions": []
-      }
-    let questions = await Question.find({ sectionId: sections[i]._id}); // Get all questions whose sectionId 
-    _questions = [];
-    for (let j = 0; j < questions.length; j++) {                      //matches the cuurent id of the Section in the loop
-      _question = {
-        "questionText": questions[i].questionText,
-        "answers": []
-      };
-      let answers = await Answer.find({ questionId: questions[j]._id});  // Get all answers whose questionId
-      
-      _question.answers = _.map(answers, answer => {                     //matches the cuurent id of the Question in the loop
-        return {
-          "id": answer.id,
-          "ans_text": answer.ans_text,
-          "isCorrect": answer.isCorrect
-        }
-      })
-
-      _questions.push(_question)
-
-    }
-    _section.questions = _questions
-    data.push(_section)
-  }
-  await new Test({test:data, userId:"5b544486909be43c18373bdd"}).save();
-  return res.send(data);
-
 });
 
 

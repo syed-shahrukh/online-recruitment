@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ControlLabel, Form, Button } from 'react-bootst
 import LoginLogo from '../../images/login-logo.png';
 import SignupLogo from '../../images/signup-logo.png';
 import Navbar from '../Navbar/Navbar';
+import Alert from '../../UI/Alerts/Alerts';
 import './Login.css';
 import Aux from '../Auxilary/Auxilary';
 import { Redirect } from 'react-router-dom';
@@ -23,6 +24,10 @@ class Login extends Component {
     signup_confirm_pass: "",
     signup_name: "",
     signup_confirm_password: "",
+    alertShowStatus: false,
+    alertTitle: '',
+    alertMessage:'',
+    alertStatus: '',
     active_user: null
 
   };
@@ -49,7 +54,7 @@ class Login extends Component {
   };
   signupUser = () => {
     const user = {
-      
+      name: this.state.signup_name,
       email: this.state.signup_email,
       password: this.state.signup_password
     }
@@ -58,13 +63,15 @@ class Login extends Component {
             const user_id = response.data._id;
             console.log("User Created successfully: " + response.data + "\nAnd the Id of user is: " + user_id);
             this.setState({signup_status: true, active_user: user_id}, () => {
-              <Redirect to={{ pathname: `/profile/${user_id}`, state: { userId: this.state.active_user }}} /> /* jshint expr: true */
+              this.props.history.push({ pathname: `/profile/`, state: { userId: this.state.active_user }});
+             /* jshint expr: true */
             });
             
             
         }).catch((error) => {
           // Error
           if (error.response) {
+            this.setState({alertShowStatus: true, alertMessage: error.response.data, alertStatus: error.response.status})
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx
           console.log(error.response.data);
@@ -91,7 +98,10 @@ class Login extends Component {
       return 'error';
     }
   }
-
+  handleAlertClose = () => {
+    const status = !this.state.alertShowStatus;
+    this.setState({alertShowStatus: status});
+  }
 
   
   render() {
@@ -99,6 +109,7 @@ class Login extends Component {
     return (
 
       <Aux>
+        <Alert show= {this.state.alertShowStatus} handleClose= {this.handleAlertClose} status={this.state.alertStatus} message={this.state.alertMessage}/>
         {this.state.signup_status ? <Redirect to="/signup"/> : console.log("")}
         <Navbar title="Welcome to Xavor Corporation" />
         <div className="row wrap">
@@ -135,7 +146,7 @@ class Login extends Component {
               </div>
             </Form>
             <div className="row">
-              <div className="col-md-12 button-container">
+              <div className="col-md-12 login-button-container">
                 <Button href="#" className="buttons" bsClass="xavor-style">Login</Button>
               </div>
             </div>
@@ -160,7 +171,7 @@ class Login extends Component {
                 <div className="col-md-12">
                   <FormGroup bsSize="large" >
                     <ControlLabel>Name</ControlLabel>{'    '}
-                    <FormControl name="signup-name" type="text" placeholder="Jane Doe" />
+                    <FormControl onChange={this.fillSignupInfo} name="signup-name" type="text" placeholder="Jane Doe" />
                   </FormGroup>{' '}
                 </div>
               </div>

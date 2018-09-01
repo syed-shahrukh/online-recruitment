@@ -3,13 +3,16 @@ import Aux from '../../Auxilary/Auxilary';
 import { Breadcrumb, Button, ButtonToolbar,DropdownButton, MenuItem, FormGroup ,ControlLabel,FormControl, Checkbox, Modal, Form } from 'react-bootstrap';
 import ReactSummernote from 'react-summernote';
 import 'react-summernote/dist/react-summernote.css'; // import styles
+import Backdrop from 'react-backdrop';
+import Spinner from '../../../UI/Spinner/Spinner';
+import Alert from '../../../UI/Alerts/Alerts';
 import 'bootstrap/dist/js/bootstrap.bundle';
 import ReactTable from 'react-table';
 import './ManageQuestion.css';
 import axios from 'axios';
 
 class ManageQuestion extends Component{
-  componentDidMount(){
+  componentWillMount(){
     axios.get('/api/sections/')
     .then(response => {
       const section = response.data;
@@ -22,14 +25,12 @@ class ManageQuestion extends Component{
       this.setState({sectionToList: section, newQuestion: newQuestion}, () => {console.log(this.state.sectionToList)});
       axios.get('/api/questions')
       .then(response => {
-        console.log(response.data);
-        
-
-      this.setState({questionsToList:response.data});
+      this.setState({questionsToList:response.data, loading: false});
       })
         .catch((error) => {
           // Error
           if (error.response) {
+            this.setState({alertShowStatus: true, alertMessage: error.response.data, alertStatus: error.response.status})
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx
           console.log(error.response.data);
@@ -45,12 +46,21 @@ class ManageQuestion extends Component{
           console.log('Error', error.message);
           }
           });;
-      });
-      
-  
-    
+      });  
+  }
+  componentWillUnmount() {
+    this.setState({newQuestion: {
+      alertShowStatus: false,
+    alertTitle: '',
+    alertMessage:'',
+    alertStatus: '',
+      questionText: '',
+      answerdetails:[],
+      sectionId: ''
+       }})
   }
     state = {
+      loading: true,
       sectionToList:[],
         questionsToList: [],
         selectedAnswer: {},
@@ -58,6 +68,7 @@ class ManageQuestion extends Component{
           questionText: '',
           answerdetails:[],
           sectionId: '',
+          imagePath: null
            },
         answerToAdd: {
             ans_text: "",
@@ -195,7 +206,7 @@ class ManageQuestion extends Component{
     handleDeleteOperation = () => {
       const selectedQuestion = this.state.newQuestion;
       const id = selectedQuestion._id;
-      this.setState({deleteStatus: true});
+      this.setState({deleteStatus: true, loading: true});
       axios.delete(`/api/questions/${id}`)
       .then(response => {
           
@@ -204,7 +215,7 @@ class ManageQuestion extends Component{
           .then( response => {
             
             
-              this.setState({questionsToList: response.data, deleteStatus: false});
+              this.setState({questionsToList: response.data, deleteStatus: false, loading: false});
               this.handleDeleteAlert();
                });
 
@@ -212,6 +223,7 @@ class ManageQuestion extends Component{
       .catch((error) => {
           // Error
           if (error.response) {
+            this.setState({alertShowStatus: true, alertMessage: error.response.data, alertStatus: error.response.status})
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx
           console.log(error.response.data);
@@ -253,6 +265,7 @@ class ManageQuestion extends Component{
       })
     }
     saveQuestion = () => {
+      
       const questionToAdd = this.state.newQuestion;
       console.log(questionToAdd);
       axios.post('/api/questions', questionToAdd)
@@ -263,6 +276,7 @@ class ManageQuestion extends Component{
             questionText: '',
             answerdetails:[],
             sectionId: '',
+            imagePath: null
              }
           this.setState({questionsToList: response.data, newQuestion: questionTemplate});
                             this.handleAddQuestionModal();
@@ -273,6 +287,7 @@ class ManageQuestion extends Component{
         if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
+        this.setState({alertShowStatus: true, alertMessage: error.response.data, alertStatus: error.response.status})
         console.log(error.response.data);
         console.log(error.response.status);
         //console.log(error.response.headers);
@@ -333,11 +348,14 @@ class ManageQuestion extends Component{
     /*********************Conditional rendering of Uploading Graphic Content*********************************/
     showGraphicalContent = (event) => {
         const show = event.target.value;
+        let question = this.state.newQuestion;
         if(show === "graphical"){
           this.setState({graphic_content: true});
         }
         else{
-          this.setState({graphic_content: false});
+          question.imagePath = null;
+          this.setState({graphic_content: false, newQuestion: question});
+          
         }
     }
     
@@ -416,7 +434,8 @@ submitModifiedAnswer = () => {
                         return {ans_text: answer.ans_text,
                                 isCorrect: answer.isCorrect}
                       }),
-      sectionId: modifiedQuestion.sectionId
+      sectionId: modifiedQuestion.sectionId,
+      imagePath: modifiedQuestion.imagePath
     }
     console.log(updatedQuestion);
     axios.put(`/api/questions/${id}`, updatedQuestion)
@@ -431,6 +450,7 @@ submitModifiedAnswer = () => {
       if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
+      this.setState({alertShowStatus: true, alertMessage: error.response.data, alertStatus: error.response.status})
       console.log(error.response.data);
       console.log(error.response.status);
       //console.log(error.response.headers);
@@ -460,11 +480,25 @@ submitModifiedAnswer = () => {
     this.handleAnswerModalInEdit();
   
   }
+  handleAlertClose = () => {
+    const status = !this.state.alertShowStatus;
+    this.setState({alertShowStatus: status});
+  }
+  fileSelectedHandler = (event) => {
+    let question = this.state.newQuestion;
+    question.imagePath = event.target.files[0] ;
+    this.setState({newQuestion: question}, () => {console.log(this.state.newQuestion);});
+  }
     render(){
       const editStatus = this.state.questionEditStatus;
         return(
             <Aux>
-                
+                {this.state.loading ? 
+                  <Backdrop>
+                    <Spinner/>
+                  </Backdrop>:
+                  <Aux>
+                    <Alert show= {this.state.alertShowStatus} handleClose= {this.handleAlertClose} status={this.state.alertStatus} message={this.state.alertMessage}/>
                     <Breadcrumb className="bread-crumb">
             
                     <Breadcrumb.Item href="/admin-portal/home/">Home</Breadcrumb.Item>
@@ -598,7 +632,7 @@ submitModifiedAnswer = () => {
                           {"     "}
                         </div>
     
-                        <input type="file" name="file" hidden/>
+                        <input type="file" name="file" onChange={this.fileSelectedHandler} hidden/>
                       </div>
                       </div>: console.log("") }
                   </FormGroup>
@@ -717,7 +751,9 @@ submitModifiedAnswer = () => {
                                 
                             </Modal>
 {/**********************************************End of Confirm Delete Modal**************************************************/}
-
+     
+     </Aux>
+                }
 </Aux>
         );
     }

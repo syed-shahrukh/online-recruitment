@@ -1,11 +1,17 @@
 const Joi = require('joi');
 Joi.objectId =  require('joi-objectid')(Joi);
 const mongoose = require('mongoose');
+const userProfile = require('../models/userModel');
 
 const CandidateProfile = mongoose.model('CandidateProfile', new mongoose.Schema({
     userId:{
       type: String,
-      required: true
+      required: true,
+      unique: true
+    },
+    email:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
     fullName: {
       type: String,

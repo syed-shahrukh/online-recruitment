@@ -1,0 +1,44 @@
+<div className="question-timer">
+                <div className="question-number">
+                    <h3>Question 50/60</h3>
+                    
+                
+                </div>
+                    
+                    <div className="test-timer">
+                        {(timer>-1)? <h3>{Math.floor(timer/60)}:{("0" + timer%60).slice(-2)}</h3>:<h3>0:00</h3>}
+                    </div>
+                </div>
+            
+                <div className="test-window">
+                    <div className="statement-and-timer">
+                    <div className="test-question-statement">
+                        <h2><label>Test Question Statement</label></h2>
+                    </div>
+                    <div className="section-timer">
+
+                        {(sectionTimer) ?
+                             (<h3>{Math.floor(sectionTimer/60)}:{("0"+sectionTimer%60).slice(-2)}</h3>)
+                                :<h3>0:00</h3>}
+                    </div>
+                    </div>
+                    <div className="question-options">
+
+                    <FormGroup>
+                        <Radio name="radioGroup">
+                            Option 1
+                        </Radio>{' '}
+                        <Radio name="radioGroup">
+                            Option 2
+                        </Radio>{' '}
+                        <Radio name="radioGroup">
+                            Option 3
+                        </Radio>
+                    </FormGroup>
+                    </div>
+        {/****************************************Next Question Button************************************************/}
+                    <div className="next-question-button-container">
+                        <Button onClick={this.changeQuestion} bsClass="xavor-style">Next</Button>
+                    </div>
+        {/*********************************End of Next Question Button************************************************/}
+                </div>

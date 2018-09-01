@@ -1,48 +1,128 @@
 import React, {Component} from 'react';
 import Aux from '../../../Auxilary/Auxilary';
 import { Modal, Breadcrumb } from 'react-bootstrap';
-
+import Backdrop from 'react-backdrop';
+import Spinner from '../../../../UI/Spinner/Spinner';
+import axios from 'axios';
 import ReactTable from 'react-table';
 import './CandidateDetails.css';
 
 class CandidateDetails extends Component{
+    
+    componentWillMount() {
+        axios.get('/api/sections/').then(response => {
+            let data = response.data;
+            let sections = data.map(section => {
+                return({id: section._id, name: section.name});
+            });
+            const section1 = sections[0].id;
+            const section2 = sections[1].id;
+            const section3 = sections[2].id;
+            this.setState({section1: section1, section2:section2, section3: section3});
+            axios.get(`/api/result/${this.state.candidateUserId}/${this.state.section1}`).then(response => {
+                    let record = this.state.testinfo;
+                    let receivedData = response.data;
+                    receivedData.sectionName = "Section 1";
+                    console.log(receivedData)
+                    let newArray = record.concat(receivedData);
+                    this.setState({testinfo: newArray}, () => {
+                        console.log("STATE ARRAYYYY");
+                        console.log(this.state.testinfo);});
+                    
+            });
+
+        })
+        axios.get(`/api/candidates/${this.state.candidateUserId}`).then(response => {
+            let recievedData = response.data;
+            let data = recievedData.map( data => {
+                return({
+                    userId: data.userId,
+                    fullName: data.fullName,
+                    mobilePhone: data.mobilePhone,
+                    email: this.props.location.state.email,
+                    positionApplied: data.positionApplied,
+                    gender: data.gender,
+                    fatherHusbandName: data.fatherHusbandName,
+                    cnic: data.cnic,
+                    dob: data.dob,
+                    maritalStatus: data.maritalStatus,
+                    homePhone: data.homePhone,
+                    currentAddress: data.currentAddress,
+                    permanentAddress: data.permanentAddress
+                });
+            });        
+             this.setState({generalInfo: data[0]});   
+        });
+/******************************************************************************************* */
+        axios.get(`/api/academicinfo/${this.state.candidateUserId}`).then(response => {
+            let recievedData = response.data;
+            let data = recievedData.map( data => {
+                return({
+                    userId: data.userId,
+                    institute: data.institute,
+                    subject: data.subject,
+                    yearEnrolled: data.yearEnrolled,
+                    yearGraduated: data.yearGraduated,
+                    degree: data.degree,
+                    grades: data.grades,
+                    major: data.major
+                });  
+            });
+            this.setState({academicInfo: data});
+        });
+/************************************************************************************************ */
+        axios.get(`/api/professionalinfo/${this.state.candidateUserId}`).then(response => {
+            let recievedData = response.data;
+            let data = recievedData.map( data => {
+                return({
+                    userId: data.userId,
+                    employer: data.employer,
+                    title: data.title,
+                    employmentDate: data.employmentDate,
+                    duration: data.duration,
+                    salaryStart: data.salaryStart,
+                    salaryFinal: data.salaryFinal,
+                    reason: data.reason,
+                    duties: data.duties
+                });  
+            });
+            this.setState({professionalInfo: data});
+        });
+/************************************************************************************************ */
+        axios.get(`/api/referenceinfo/${this.state.candidateUserId}`).then(response => {
+            let recievedData = response.data;
+            console.log(recievedData);
+            let data = recievedData.map( data => {
+                return({
+                    userId: data.userId,
+                    name: data.name,
+                    relationship: data.relationship,
+                    phone: data.phone,
+                    yearsKnown: data.yearsKnown,
+                    notified: data.notified
+                });  
+            });
+            this.setState({referencesInfo: data, loading: false});
+        });
+
+        
+    }
     state= {
+        section1: '',
+        section2: '',
+        section3: '',
+        loading: true,
+        sectionDetails: [],
+        showSectionDetailsStatus: false,
+        candidateUserId: this.props.location.state.userId,
+        generalInfo: {},
+        academicInfo:[],
+        professionalInfo:[],
+        referencesInfo:[],
+        testinfo:[],
         parent_show:false,
-        curr_active: '',
-        duties_to_show:'',
-        name: 'Syed Muhammad Shahrukh',
-        fathername: 'Syed Waseem Akhtar',
-        cnic: '17301-7643773-5',
-        dob:'22/01/1995',
-        gender:'Male',
-        marital:'Single',
-        email:'sshahrukh@xavor.com',
-        mobile:'0333-9xxxxx7',
-        homephone:'042-3xxxxx-x',
-        current_address:'Bankers Avenue, Bedian Rd, Lahore.',
-        permanent_address:'Hayatabad, Peshawar',
-        position_applied:'Software Engineer',
-        salary_expected:'175000',
-        employment_desired: 'Full Time',
-        expected_joining:'2',
-        academic_records: [
-            {institute:'Forward Model School',subject:'Sciences',degree:'Matriculation',from:'12/07/2000',to:'16/10/2010',grades:'858/1050'},
-            {institute:'Edwardes College',subject:'Pre-Engineering',degree:'FSc',from:'12/08/2010',to:'28/04/2012',grades:'790/1100'},
-            {institute:'NUCES - FAST',subject:'Engineering',degree:'BS Computer Science',from:'14/08/2012',to:'24/12/2015',grades:'2.1'},
-        ],
-        professional_records: [
-            {employer:'Google',address:'Montreal, Canada',employment_start:'January, 2012',employment_end:'May 2018',salary_start:'75000',salary_final:'100000',job_title:'Software Engineer',reason_leaving:'Boredom',duties:'Hands on my neck, foot on my back Closing in from every side Bleeding me dry, I\'m fading fast\nLeft for dead but I will rise up on my own I could make it alone I got all that I need to survive'}
-            
-        ],
-        reference_records: [
-            {name:'Waseem',address:'Montreal, Canada',telephone:'+923339103604',relationship:'Teacher',years_known:'7',characters_vouch:'Loyal'}
-            
-        ],
-        test_records: [
-            {attempt_date:'8 June, 2018',marks:'74',status:'Passed'}
-            
-        ],
-        academic_columns: [
+       
+        academicColumns: [
             {
               Header: "Name of institute",
               headerClassName: "table-header-grid",
@@ -62,12 +142,12 @@ class CandidateDetails extends Component{
                     {
                         Header: "From",
                         headerClassName: "table-header-grid",
-                        accessor: "from"
+                        accessor: "yearEnrolled"
                     },
                     {
                         Header: "To",
                         headerClassName: "table-header-grid",
-                        accessor: "to"
+                        accessor: "yearGraduated"
                     }
                 ]
             },
@@ -84,58 +164,47 @@ class CandidateDetails extends Component{
             }
             
           ],
-          professional_columns: [
+          professionalColumns: [
             {
               Header: "Employer/Company",
               headerClassName: "table-header-grid",
               accessor: "employer",
               show: true
-            },
-            {
-              Header: "Adress",
-              headerClassName: "table-header-grid",
-              accessor: "address",
-              show: true
-            },
-            {
-                Header: "Employment Tenure",
-                headerClassName: "table-header-grid",
-                columns: [
-                    {
-                        Header: "From",
-                        headerClassName: "table-header-grid",
-                        accessor: "employment_start"
-                    },
-                    {
-                        Header: "To",
-                        headerClassName: "table-header-grid",
-                        accessor: "employment_end"
-                    }
-                ]
             },{
+                Header: "Job Title",
+                headerClassName: "table-header-grid",
+                accessor: "title",
+                show: true
+              },
+            {
+                Header: "Employment Date",
+                headerClassName: "table-header-grid",
+                accessor: "employmentDate"
+            },{
+                Header: "Duration",
+                headerClassName: "table-header-grid",
+                accessor: "duration",
+                show: true
+              },
+            {
                 Header: "Salary",
                 headerClassName: "table-header-grid",
                 columns: [
                     {
                         Header: "Start",
                         headerClassName: "table-header-grid",
-                        accessor: "salary_start"
+                        accessor: "salaryStart"
                     },
                     {
                         Header: "Final",
                         headerClassName: "table-header-grid",
-                        accessor: "salary_final"
+                        accessor: "salaryFinal"
                     }
                 ]
             },
             {
-              Header: "Job Title",
-              headerClassName: "table-header-grid",
-              accessor: "job_title",
-              show: true
-            },{
               Header: "Reason for Leaving",
-              accessor: "reason_leaving",
+              accessor: "reason",
               headerClassName: "table-header-grid",
               show: true
             },
@@ -161,52 +230,68 @@ class CandidateDetails extends Component{
               show: true
             },
             {
-              Header: "Address",
-              headerClassName: "table-header-grid",
-              accessor: "address",
-              show: true
-            },
+                Header: "Relationship",
+                headerClassName: "table-header-grid",
+                accessor: "relationship",
+                show: true
+              },
             {
                 Header: "Telephone",
                 headerClassName: "table-header-grid",
-                accessor: "telephone"
+                accessor: "phone"
             },
             {
-              Header: "Relationship",
-              headerClassName: "table-header-grid",
-              accessor: "relationship",
-              show: true
-            },{
               Header: "Years Known",
-              accessor: "years_known",
+              accessor: "yearsKnown",
               headerClassName: "table-header-grid",
               show: true
             },{
-                Header: "Characters they vouch",
-                accessor: "characters_vouch",
+                Header: "Notified",
+                accessor: "notified",
+                Cell: ({ value }) => {
+                    if(value){
+                        return "Yes";
+                    }
+                    else{
+                        return "No";
+                    }
+                },
                 headerClassName: "table-header-grid",
                 show: true
               }
             
           ],
-          test_columns: [
+          testColumns: [
+            {
+                Header: "Section Id",
+                headerClassName: "table-header-grid",
+                accessor: "sectionId",
+                show: false
+              },
             {
               Header: "Attempt Date",
               headerClassName: "table-header-grid",
-              accessor: "attempt_date",
+              accessor: "date",
               show: true
             },
             {
-              Header: "Marks",
-              headerClassName: "table-header-grid",
-              accessor: "marks",
-              show: true
-            },
-            {
-                Header: "Status",
+                Header: "Section",
                 headerClassName: "table-header-grid",
-                accessor: "status"
+                accessor: "sectionName",
+                show: true
+              },
+            {
+              Header: "Total Questions",
+              headerClassName: "table-header-grid",
+              accessor: "totalQuestions",
+              show: true
             },
+            {
+                Header: "Correct Answers",
+                headerClassName: "table-header-grid",
+                accessor: "correctAnswers"
+            },
+            
             {
               Header: "Details",
               headerClassName: "table-header-grid",
@@ -215,7 +300,7 @@ class CandidateDetails extends Component{
                 maxiWidth:60,
                 Cell: row => (
                     <div>
-                      <a onClick={/*this.catchDuties.bind(this, row.original)*/() => {console.log("redirect to test details!");}}>view</a>             
+                      <a onClick={this.getSectionDetails.bind(this, row.original)}>view</a>             
                     </div>
                   )
               }
@@ -230,6 +315,10 @@ class CandidateDetails extends Component{
     handleClose = () => {
         this.setState({ parent_show: false });
     }
+    handleSectionDetailsModal = () => {
+        const status = !this.state.showSectionDetailsStatus;
+        this.setState({ showSectionDetailsStatus: status });
+    }
     
     handleShow = () => {
         this.setState({ parent_show: true });
@@ -240,9 +329,58 @@ class CandidateDetails extends Component{
         this.setState({curr_active: dummy}, ()=> {console.log("State:  " +this.state.curr_active)});
         
     }
+    getSectionDetails = (row) => {
+        this.setState({loading: true});
+        axios.get(`/api/result/getSectionDetails/${row.sectionId}`).then(response => {
+            this.handleSectionDetailsModal();
+            console.log(response.data);
+            
+            
+            this.setState({loading: false, sectionDetails: response.data});
+            
+        })
+    }
     render(){
-        
+        let details = "Nothing";
+        if(this.state.sectionDetails != []){
+             details = this.state.sectionDetails.map(question => {
+                    const options = question.options.map(option => {
+                        return (<li>
+                                {option.ans_text}
+                            </li>);
+                    })
+                return (
+                    <Aux>
+                        <div className="test-window-details">
+                    <div className="statement-and-timer">
+                        <div className="test-question-statement">
+                            <p>{question.questionText}</p>
+                        </div>
+                    </div>
+
+                    <div className="question-options">
+                    
+                        <ul>
+                    
+                        {options}
+
+                        </ul>
+                    
+                    </div>
+                   
+                </div>
+                    
+                    </Aux>
+                );
+            })
+        }
+         
         return(
+            <Aux>
+            {this.state.loading ? <Backdrop>
+                <Spinner/>
+            </Backdrop>
+            :
             <Aux>
             {/*************************************************HyperLinks******************************************/}
             <div className="container-fluid ">
@@ -276,7 +414,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-                <p>{this.state.name}</p>
+                <p>{this.state.generalInfo.fullName}</p>
             </div>
 
             <div className="col-md-2">
@@ -284,7 +422,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-            <p>{this.state.fathername}</p>
+            <p>{this.state.generalInfo.fatherHusbandName}</p>
             </div>
         </div>
         {/***************************************************************************/}
@@ -295,7 +433,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-                <p>{this.state.cnic}</p>
+                <p>{this.state.generalInfo.cnic}</p>
             </div>
 
             <div className="col-md-2">
@@ -303,7 +441,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-            <p>{this.state.dob}</p>
+            <p>{this.state.generalInfo.dob}</p>
             </div>
         </div>
         {/***************************************************************************/}
@@ -314,7 +452,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-                <p>{this.state.gender}</p>
+                <p>{this.state.generalInfo.gender}</p>
             </div>
 
             <div className="col-md-2">
@@ -322,7 +460,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-            <p>{this.state.marital}</p>
+            <p>{this.state.generalInfo.maritalStatus}</p>
             </div>
         </div>
         {/***************************************************************************/}
@@ -333,7 +471,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-                <p>{this.state.email}</p>
+                <p>{this.state.generalInfo.email}</p>
             </div>
 
             <div className="col-md-2">
@@ -341,7 +479,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-            <p>{this.state.mobile}</p>
+            <p>{this.state.generalInfo.mobilePhone}</p>
             </div>
         </div>
         {/***************************************************************************/}
@@ -352,7 +490,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-                <p>{this.state.homephone}</p>
+                <p>{this.state.generalInfo.homePhone}</p>
             </div>
         </div>
         {/***************************************************************************/}
@@ -363,7 +501,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-8">
-                <p>{this.state.permanent_address}</p>
+                <p>{this.state.generalInfo.permanentAddress}</p>
             </div>
         </div>
         {/***************************************************************************/}
@@ -374,7 +512,7 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-8">
-                <p>{this.state.current_address}</p>
+                <p>{this.state.generalInfo.currentAddress}</p>
             </div>
 
         </div>
@@ -386,36 +524,14 @@ class CandidateDetails extends Component{
             </div>
 
             <div className="col-md-4">
-                <p>{this.state.position_applied}</p>
+                <p>{this.state.generalInfo.positionApplied}</p>
             </div>
 
-            <div className="col-md-2">
-                <label>Employment Desired: </label>
-            </div>
-
-            <div className="col-md-4">
-            <p>{this.state.employment_desired}</p>
-            </div>
+           
         </div>
         {/***************************************************************************/}
 
-        <div className="row">
-            <div className="col-md-2">
-                <label>Expected salary: </label>
-            </div>
-
-            <div className="col-md-4">
-                <p>{this.state.salary_expected}</p>
-            </div>
-
-            <div className="col-md-2">
-                <label>Available to work: </label>
-            </div>
-
-            <div className="col-md-4">
-            <p>{this.state.expected_joining} weeks</p>
-            </div>
-        </div>
+        
         </div>
         {/**************************End of General Information***************************/}
         <hr/>
@@ -429,7 +545,7 @@ class CandidateDetails extends Component{
            {/***************************************************************************/}
            <div className="row">
            <div className="col-md-12">
-           <ReactTable className="table-grid" showPagination={ false } data={this.state.academic_records} minRows={0} columns={this.state.academic_columns} />
+           <ReactTable className="table-grid" showPagination={ false } data={this.state.academicInfo} minRows={0} columns={this.state.academicColumns} />
            </div>
          </div>
          </div>
@@ -457,7 +573,7 @@ class CandidateDetails extends Component{
             {/*************************************Professional Records*****************************************/}
             <div className="row">
                 <div className="col-md-12">
-                    <ReactTable className="table-grid" showPagination={ false } data={this.state.professional_records} minRows={0} columns={this.state.professional_columns} />
+                    <ReactTable className="table-grid" showPagination={ false } data={this.state.professionalInfo} minRows={0} columns={this.state.professionalColumns} />
                 </div>
             </div>
             </div>
@@ -476,7 +592,7 @@ class CandidateDetails extends Component{
             {/*************************************Reference Table*****************************************/}
             <div className="row">
                     <div className="col-md-12">
-                    <ReactTable className="table-grid" showPagination={ false } data={this.state.reference_records} minRows={0} columns={this.state.reference_columns} />
+                    <ReactTable className="table-grid" showPagination={ false } data={this.state.referencesInfo} minRows={0} columns={this.state.reference_columns} />
                     </div>
                 </div>
             
@@ -495,12 +611,21 @@ class CandidateDetails extends Component{
     {/*********************************************************************************************************************/}
     <div className="row">
         <div className="col-md-12">
-            <ReactTable className="table-grid" showPagination={ false } data={this.state.test_records} minRows={0} columns={this.state.test_columns} />
+            <ReactTable className="table-grid" showPagination={ false } data={this.state.testinfo} minRows={0} columns={this.state.testColumns} />
         </div>
     </div>
-
+    <Modal show={this.state.showSectionDetailsStatus} onHide={this.handleSectionDetailsModal} >
+              <Modal.Header closeButton>
+                <Modal.Title>Section Details</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {details}
+              </Modal.Body>
+            </Modal>
     {/***********************************End of Test Performance******************************************/}
     </div>
+    </Aux>
+    }
             </Aux>
         );
     }

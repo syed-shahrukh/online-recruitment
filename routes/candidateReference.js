@@ -56,7 +56,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const referenceInfo = await CandidateReference.findById(req.params.id);
+  const referenceInfo = await CandidateReference.find({userId: req.params.id});
 
   if (!referenceInfo) return res.status(404).send('The candidate reference information with the given ID was not found.');
 
